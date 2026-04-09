@@ -1,5 +1,3 @@
----
-
 ````md
 # Запуск проекта
 
@@ -11,9 +9,10 @@
 cd backend
 go mod tidy
 go run main.go
+```
 ````
 
-Backend будет доступен по адресу:
+Backend доступен по адресу:
 
 ```
 http://localhost:8080
@@ -29,7 +28,7 @@ npm install
 npm run dev
 ```
 
-Frontend будет доступен по адресу:
+Frontend доступен по адресу:
 
 ```
 http://localhost:5173
@@ -57,11 +56,4 @@ http://localhost:5173
 
 ```bash
 docker-compose down
-```
-
-```
-
----
-
-
 ```

@@ -1,11 +1,38 @@
-version: "3.9"
-
 services:
+  db:
+    image: postgres:16
+    container_name: animal-center-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: animal_center
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d animal_center"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   backend:
     build: ./backend
     container_name: animal-center-backend
     ports:
       - "8080:8080"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: animal_center
+      DB_SSLMODE: disable
+      ML_SERVICE_URL: http://ml-service:8000
+    depends_on:
+      db:
+        condition: service_healthy
 
   frontend:
     build: ./frontend
@@ -16,3 +43,12 @@ services:
       VITE_API_URL: http://localhost:8080/api
     depends_on:
       - backend
+
+  ml-service:
+    build: ./ml-service
+    container_name: animal-center-ml
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:

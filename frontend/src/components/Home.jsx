@@ -23,6 +23,11 @@ export default function Home() {
     loadAnimals();
   }, []);
 
+  const handleSearchSubmit = async (e) => {
+    e.preventDefault();
+    await loadAnimals();
+  };
+
   const adopted = animals.filter((a) => a.status === "adopted").length;
   const treatment = animals.filter(
     (a) => a.status === "treatment" || a.health?.toLowerCase().includes("леч"),
@@ -35,7 +40,7 @@ export default function Home() {
         <p>Все животные ждут своего хозяина</p>
       </div>
 
-      <div className="filters">
+      <form className="filters" onSubmit={handleSearchSubmit}>
         <input
           type="text"
           placeholder="Поиск по имени или породе..."
@@ -49,10 +54,10 @@ export default function Home() {
           <option>Кошка</option>
         </select>
 
-        <button className="secondary-btn" onClick={loadAnimals}>
+        <button type="submit" className="secondary-btn">
           Найти
         </button>
-      </div>
+      </form>
 
       <div className="stats-grid">
         <div className="stat-card">

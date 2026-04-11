@@ -1,4 +1,3 @@
-````md
 # Запуск проекта
 
 ## 1. Локальный запуск (без Docker)
@@ -10,7 +9,6 @@ cd backend
 go mod tidy
 go run main.go
 ```
-````
 
 Backend доступен по адресу:
 

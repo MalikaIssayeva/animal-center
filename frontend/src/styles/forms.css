@@ -1,0 +1,52 @@
+.form-card {
+  max-width: 720px;
+}
+
+.form-row {
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+}
+
+label input,
+label select,
+label textarea {
+  margin-top: 8px;
+  font-weight: normal;
+}
+
+.filters select {
+  max-width: 220px;
+}
+
+#searchInput {
+  flex: 1 1 300px;
+}
+
+#typeFilter {
+  width: 180px;
+}
+
+.upload-box {
+  border: 2px dashed var(--primary);
+  background: #f7fbf9;
+  border-radius: 18px;
+  padding: 30px;
+  text-align: center;
+}
+
+.upload-icon {
+  font-size: 50px;
+  margin-bottom: 8px;
+}
+
+.result-box {
+  margin-top: 18px;
+}
+
+.hidden {
+  display: none;
+}

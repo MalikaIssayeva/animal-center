@@ -1,0 +1,106 @@
+.app-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.page-content {
+  margin-top: 18px;
+}
+
+.header,
+.brand,
+.filters,
+.tabs,
+.stats-grid,
+.two-cols,
+.header-actions,
+.user-box {
+  display: flex;
+}
+
+.header,
+.filters,
+.tabs {
+  gap: 12px;
+}
+
+.header {
+  justify-content: space-between;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 16px 20px;
+}
+
+.brand {
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.header p {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.header-actions {
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.user-box {
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filters {
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.stats-grid {
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 18px 0 24px;
+}
+
+.two-cols {
+  gap: 16px;
+}
+
+.two-cols > label {
+  flex: 1;
+}
+
+.analytics-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.animal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}

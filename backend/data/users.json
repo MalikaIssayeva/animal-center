@@ -38,5 +38,14 @@
     "role": "user",
     "accountType": "owner",
     "favorites": []
+  },
+  {
+    "id": 5,
+    "name": "Mikey",
+    "email": "malika.2mgroup@gmail.com",
+    "password": "12345",
+    "role": "user",
+    "accountType": "adopter",
+    "favorites": []
   }
 ]

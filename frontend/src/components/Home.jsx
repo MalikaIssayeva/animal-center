@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { request } from "../api";
 
-export default function Home() {
+export default function Home({ user }) {
   const [animals, setAnimals] = useState([]);
   const [search, setSearch] = useState("");
   const [type, setType] = useState("Все");
@@ -131,17 +131,19 @@ export default function Home() {
 
                 <p style={{ marginTop: "10px" }}>{a.description || ""}</p>
 
-                <div
-                  style={{ marginTop: "14px", display: "flex", gap: "10px" }}
-                >
-                  <button
-                    type="button"
-                    className="secondary-btn"
-                    onClick={() => handleDelete(a.id, a.name)}
+                {user?.role === "admin" && (
+                  <div
+                    style={{ marginTop: "14px", display: "flex", gap: "10px" }}
                   >
-                    Удалить
-                  </button>
-                </div>
+                    <button
+                      type="button"
+                      className="secondary-btn"
+                      onClick={() => handleDelete(a.id, a.name)}
+                    >
+                      Удалить
+                    </button>
+                  </div>
+                )}
               </div>
             </article>
           ))

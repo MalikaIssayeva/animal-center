@@ -1,0 +1,72 @@
+@media (max-width: 900px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 700px) {
+  .app-shell {
+    padding: 14px;
+  }
+
+  .hero h2 {
+    font-size: 28px;
+  }
+
+  .stats-grid {
+    flex-direction: column;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-actions .primary-btn,
+  .header-actions .secondary-btn {
+    width: 100%;
+  }
+
+  .user-box {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .user-pill {
+    text-align: center;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .filters select,
+  .filters input,
+  .filters button {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .auth-card {
+    padding: 18px;
+  }
+
+  .auth-card h2 {
+    font-size: 28px;
+  }
+
+  .animal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .two-cols {
+    flex-direction: column;
+  }
+}

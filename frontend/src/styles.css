@@ -320,6 +320,14 @@ th {
   color: var(--muted);
 }
 
+.animal-content button {
+  min-width: 110px;
+}
+
+.filters select {
+  max-width: 220px;
+}
+
 @media (max-width: 700px) {
   .header {
     flex-direction: column;

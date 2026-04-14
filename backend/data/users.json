@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "name": "Admin",
+    "email": "admin@mail.com",
+    "password": "123456",
+    "role": "admin",
+    "accountType": "admin",
+    "favorites": []
+  },
+  {
+    "id": 2,
+    "name": "Malika",
+    "email": "owner@mail.com",
+    "password": "123456",
+    "role": "user",
+    "accountType": "owner",
+    "favorites": []
+  },
+  {
+    "id": 3,
+    "name": "Aruzhan",
+    "email": "adopter@mail.com",
+    "password": "123456",
+    "role": "user",
+    "accountType": "adopter",
+    "favorites": [
+      1,
+      3,
+      7
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Test Owner",
+    "email": "testowner@mail.com",
+    "password": "123456",
+    "role": "user",
+    "accountType": "owner",
+    "favorites": []
+  }
+]

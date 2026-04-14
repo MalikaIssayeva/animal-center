@@ -1,0 +1,386 @@
+basePath: /api
+definitions:
+  main.Analytics:
+    properties:
+      adoptedAnimals:
+        type: integer
+      breedTable:
+        items:
+          $ref: '#/definitions/main.BreedStat'
+        type: array
+      modelAccuracy:
+        type: integer
+      monthlyIntake:
+        items:
+          $ref: '#/definitions/main.MonthlyStat'
+        type: array
+      needTreatment:
+        type: integer
+      totalAnimals:
+        type: integer
+      typeDistribution:
+        items:
+          $ref: '#/definitions/main.Distribution'
+        type: array
+    type: object
+  main.Animal:
+    properties:
+      age:
+        type: string
+      breed:
+        type: string
+      description:
+        type: string
+      gender:
+        type: string
+      health:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      type:
+        type: string
+    type: object
+  main.BreedStat:
+    properties:
+      breed:
+        type: string
+      count:
+        type: integer
+      status:
+        type: string
+    type: object
+  main.Distribution:
+    properties:
+      label:
+        type: string
+      value:
+        type: integer
+    type: object
+  main.LoginInput:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  main.MonthlyStat:
+    properties:
+      count:
+        type: integer
+      month:
+        type: string
+    type: object
+  main.RegisterInput:
+    properties:
+      accountType:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  main.SafeUser:
+    properties:
+      accountType:
+        type: string
+      email:
+        type: string
+      favorites:
+        items:
+          type: integer
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      role:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API для приюта животных
+  title: Animal Center API
+  version: "1.0"
+paths:
+  /analytics:
+    get:
+      description: Возвращает статистику по животным
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Analytics'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить аналитику
+      tags:
+      - analytics
+  /animals:
+    get:
+      description: Возвращает список животных с поиском, фильтрацией и сортировкой
+      parameters:
+      - description: Поиск по имени или породе
+        in: query
+        name: search
+        type: string
+      - description: Тип животного
+        in: query
+        name: type
+        type: string
+      - description: 'Сортировка: name_asc, name_desc, age_asc, age_desc'
+        in: query
+        name: sort
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.Animal'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить список животных
+      tags:
+      - animals
+    post:
+      consumes:
+      - application/json
+      description: Создает новую карточку животного
+      parameters:
+      - description: Данные животного
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/main.Animal'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.Animal'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Добавить животное
+      tags:
+      - animals
+  /animals/{id}:
+    delete:
+      description: Удаляет животное по ID
+      parameters:
+      - description: ID животного
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Удалить животное
+      tags:
+      - animals
+    get:
+      description: Возвращает одно животное по его ID
+      parameters:
+      - description: ID животного
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Animal'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить животное по ID
+      tags:
+      - animals
+  /classify:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Загружает изображение и отправляет его в ML service
+      parameters:
+      - description: Изображение животного
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "502":
+          description: Bad Gateway
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Классификация животного
+      tags:
+      - classify
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Авторизация по email и паролю
+      parameters:
+      - description: Данные для входа
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/main.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.SafeUser'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Вход пользователя
+      tags:
+      - auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Создает нового пользователя с типом owner или adopter
+      parameters:
+      - description: Данные регистрации
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/main.RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.SafeUser'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Регистрация пользователя
+      tags:
+      - auth
+swagger: "2.0"

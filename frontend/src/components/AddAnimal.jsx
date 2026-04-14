@@ -74,6 +74,8 @@ export default function AddAnimal({ onSuccess }) {
             <select name="type" value={form.type} onChange={handleChange}>
               <option>Собака</option>
               <option>Кошка</option>
+              <option>Птица</option>
+              <option>Хомяк</option>
             </select>
           </label>
         </div>

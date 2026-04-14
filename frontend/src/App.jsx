@@ -14,7 +14,6 @@ export default function App() {
           <div className="brand-logo">🐾</div>
           <div>
             <h1>Центр защиты животных</h1>
-            <p>Черновой вариант дипломного проекта</p>
           </div>
         </div>
 

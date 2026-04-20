@@ -1,5 +1,10 @@
 basePath: /api
 definitions:
+  main.AdoptionRequestInput:
+    properties:
+      userId:
+        type: integer
+    type: object
   main.Analytics:
     properties:
       adoptedAnimals:
@@ -25,6 +30,8 @@ definitions:
     type: object
   main.Animal:
     properties:
+      adoptionRequestedBy:
+        type: integer
       age:
         type: string
       breed:
@@ -41,6 +48,8 @@ definitions:
         type: string
       name:
         type: string
+      ownerId:
+        type: integer
       status:
         type: string
       tags:
@@ -106,6 +115,11 @@ definitions:
       name:
         type: string
       role:
+        type: string
+    type: object
+  main.StatusUpdateInput:
+    properties:
+      status:
         type: string
     type: object
 host: localhost:8080
@@ -268,6 +282,97 @@ paths:
               type: string
             type: object
       summary: Получить животное по ID
+      tags:
+      - animals
+  /animals/{id}/adopt-request:
+    post:
+      consumes:
+      - application/json
+      description: Создает заявку на усыновление животного и переводит его в статус
+        pending
+      parameters:
+      - description: ID животного
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: ID пользователя
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/main.AdoptionRequestInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Animal'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Подать заявку на усыновление
+      tags:
+      - animals
+  /animals/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: 'Обновляет статус животного: available, adopted или treatment'
+      parameters:
+      - description: ID животного
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Новый статус
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/main.StatusUpdateInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Animal'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Изменить статус животного
       tags:
       - animals
   /classify:

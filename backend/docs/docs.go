@@ -250,6 +250,142 @@ const docTemplate = `{
                 }
             }
         },
+        "/animals/{id}/adopt-request": {
+            "post": {
+                "description": "Создает заявку на усыновление животного и переводит его в статус pending",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "animals"
+                ],
+                "summary": "Подать заявку на усыновление",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID животного",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "ID пользователя",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.AdoptionRequestInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.Animal"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/animals/{id}/status": {
+            "patch": {
+                "description": "Обновляет статус животного: available, adopted или treatment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "animals"
+                ],
+                "summary": "Изменить статус животного",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID животного",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Новый статус",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.StatusUpdateInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.Animal"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/classify": {
             "post": {
                 "description": "Загружает изображение и отправляет его в ML service",
@@ -423,6 +559,14 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "main.AdoptionRequestInput": {
+            "type": "object",
+            "properties": {
+                "userId": {
+                    "type": "integer"
+                }
+            }
+        },
         "main.Analytics": {
             "type": "object",
             "properties": {
@@ -461,6 +605,9 @@ const docTemplate = `{
         "main.Animal": {
             "type": "object",
             "properties": {
+                "adoptionRequestedBy": {
+                    "type": "integer"
+                },
                 "age": {
                     "type": "string"
                 },
@@ -484,6 +631,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "ownerId": {
+                    "type": "integer"
                 },
                 "status": {
                     "type": "string"
@@ -585,6 +735,14 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "role": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.StatusUpdateInput": {
+            "type": "object",
+            "properties": {
+                "status": {
                     "type": "string"
                 }
             }

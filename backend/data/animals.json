@@ -9,7 +9,9 @@
     "health": "Здоров",
     "description": "Дружелюбный и спокойный пес.",
     "image": "🐶",
-    "status": "available"
+    "status": "pending",
+    "ownerId": 0,
+    "adoptionRequestedBy": 1
   },
   {
     "id": 2,
@@ -21,7 +23,9 @@
     "health": "Здоров",
     "description": "Верный охранник и хороший друг.",
     "image": "🐕",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 3,
@@ -33,7 +37,9 @@
     "health": "Активный",
     "description": "Очень энергичный и игривый.",
     "image": "🐶",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 4,
@@ -45,7 +51,9 @@
     "health": "Здоров",
     "description": "Красивая и активная собака.",
     "image": "🐺",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 5,
@@ -57,7 +65,9 @@
     "health": "На лечении",
     "description": "Добрый пес, нуждается в заботе.",
     "image": "🐕",
-    "status": "treatment"
+    "status": "treatment",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 6,
@@ -69,7 +79,9 @@
     "health": "Здоров",
     "description": "Спокойный и сильный.",
     "image": "🐶",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 7,
@@ -81,7 +93,9 @@
     "health": "Здоров",
     "description": "Активный и преданный.",
     "image": "🐕",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 8,
@@ -93,7 +107,9 @@
     "health": "Здоров",
     "description": "Ласковая и добрая.",
     "image": "🐶",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 9,
@@ -105,7 +121,9 @@
     "health": "Здоров",
     "description": "Серьезный, но верный.",
     "image": "🐕",
-    "status": "adopted"
+    "status": "adopted",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 10,
@@ -117,9 +135,10 @@
     "health": "Здоров",
     "description": "Умный и игривый.",
     "image": "🐩",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
-
   {
     "id": 11,
     "name": "Муся",
@@ -130,7 +149,9 @@
     "health": "Стерилизована",
     "description": "Ласковая и спокойная.",
     "image": "🐱",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 12,
@@ -142,7 +163,9 @@
     "health": "Здоров",
     "description": "Пушистый и добрый.",
     "image": "🐈",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 13,
@@ -154,7 +177,9 @@
     "health": "Здоров",
     "description": "Спокойный и ленивый.",
     "image": "😺",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 14,
@@ -166,7 +191,9 @@
     "health": "Здоров",
     "description": "Любит тепло и ласку.",
     "image": "🐱",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 15,
@@ -178,7 +205,9 @@
     "health": "На лечении",
     "description": "Нуждается в заботе.",
     "image": "🐈",
-    "status": "treatment"
+    "status": "treatment",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 16,
@@ -190,7 +219,9 @@
     "health": "Здоров",
     "description": "Спокойная и красивая.",
     "image": "🐱",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 17,
@@ -202,7 +233,9 @@
     "health": "Здоров",
     "description": "Большой и добрый.",
     "image": "🐈",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 18,
@@ -214,7 +247,9 @@
     "health": "Здоров",
     "description": "Игривая и веселая.",
     "image": "😸",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 19,
@@ -226,7 +261,9 @@
     "health": "Здоров",
     "description": "Спокойный и мудрый.",
     "image": "🐱",
-    "status": "adopted"
+    "status": "adopted",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 20,
@@ -238,9 +275,10 @@
     "health": "Здоров",
     "description": "Активный и красивый.",
     "image": "🐈",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
-
   {
     "id": 21,
     "name": "Кеша",
@@ -251,7 +289,9 @@
     "health": "Здоров",
     "description": "Любит говорить.",
     "image": "🦜",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 22,
@@ -263,7 +303,9 @@
     "health": "Здоров",
     "description": "Поет по утрам.",
     "image": "🐦",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 23,
@@ -275,7 +317,9 @@
     "health": "Здоров",
     "description": "Яркий и активный.",
     "image": "🦜",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 24,
@@ -287,7 +331,9 @@
     "health": "Здоров",
     "description": "Любит летать.",
     "image": "🐦",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 25,
@@ -299,9 +345,10 @@
     "health": "Здоров",
     "description": "Очень дружелюбный.",
     "image": "🐦",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
-
   {
     "id": 26,
     "name": "Пушистик",
@@ -312,7 +359,9 @@
     "health": "Здоров",
     "description": "Любит бегать в колесе.",
     "image": "🐹",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 27,
@@ -324,7 +373,9 @@
     "health": "Здоров",
     "description": "Маленький и милый.",
     "image": "🐹",
-    "status": "available"
+    "status": "adopted",
+    "ownerId": 0,
+    "adoptionRequestedBy": 5
   },
   {
     "id": 28,
@@ -336,19 +387,9 @@
     "health": "Здоров",
     "description": "Белый и пушистый.",
     "image": "🐹",
-    "status": "available"
-  },
-  {
-    "id": 29,
-    "name": "Бублик",
-    "type": "Хомяк",
-    "breed": "Джунгарский",
-    "age": "8 месяцев",
-    "gender": "Самец",
-    "health": "Здоров",
-    "description": "Любит кушать.",
-    "image": "🐹",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   },
   {
     "id": 30,
@@ -360,6 +401,8 @@
     "health": "Здоров",
     "description": "Активный и веселый.",
     "image": "🐹",
-    "status": "available"
+    "status": "available",
+    "ownerId": 0,
+    "adoptionRequestedBy": 0
   }
 ]

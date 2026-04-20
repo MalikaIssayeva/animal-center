@@ -50,3 +50,7 @@ label textarea {
 .hidden {
   display: none;
 }
+
+.card-actions select {
+  min-width: 170px;
+}

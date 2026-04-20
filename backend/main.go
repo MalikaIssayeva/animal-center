@@ -28,17 +28,19 @@ import (
 )
 
 type Animal struct {
-	ID          int      `json:"id"`
-	Name        string   `json:"name"`
-	Type        string   `json:"type"`
-	Breed       string   `json:"breed"`
-	Age         string   `json:"age"`
-	Gender      string   `json:"gender"`
-	Health      string   `json:"health"`
-	Description string   `json:"description"`
-	Image       string   `json:"image"`
-	Status      string   `json:"status"`
-	Tags        []string `json:"tags,omitempty"`
+	ID                  int      `json:"id"`
+	Name                string   `json:"name"`
+	Type                string   `json:"type"`
+	Breed               string   `json:"breed"`
+	Age                 string   `json:"age"`
+	Gender              string   `json:"gender"`
+	Health              string   `json:"health"`
+	Description         string   `json:"description"`
+	Image               string   `json:"image"`
+	Status              string   `json:"status"`
+	Tags                []string `json:"tags,omitempty"`
+	OwnerID             int      `json:"ownerId"`
+	AdoptionRequestedBy int      `json:"adoptionRequestedBy"`
 }
 
 type User struct {
@@ -61,6 +63,14 @@ type RegisterInput struct {
 type LoginInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type StatusUpdateInput struct {
+	Status string `json:"status"`
+}
+
+type AdoptionRequestInput struct {
+	UserID int `json:"userId"`
 }
 
 type SafeUser struct {
@@ -127,11 +137,16 @@ func main() {
 		api.POST("/animals", createAnimal)
 		api.GET("/animals/:id", getAnimalByID)
 		api.DELETE("/animals/:id", deleteAnimal)
+		api.POST("/animals/:id/adopt-request", requestAdoption)
+		api.PATCH("/animals/:id/status", updateAnimalStatus)
 
 		api.GET("/analytics", getAnalytics)
 		api.POST("/classify", classifyAnimal)
 		api.POST("/register", registerUser)
 		api.POST("/login", loginUser)
+		api.GET("/users/:id/favorites", getUserFavorites)
+		api.POST("/users/:id/favorites/:animalId", addFavorite)
+		api.DELETE("/users/:id/favorites/:animalId", removeFavorite)
 	}
 
 	log.Println("server started on :8080")
@@ -151,7 +166,7 @@ func getEnv(key, fallback string) string {
 func cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PATCH, OPTIONS")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		if c.Request.Method == http.MethodOptions {
 			c.AbortWithStatus(http.StatusNoContent)
@@ -400,6 +415,7 @@ func createAnimal(c *gin.Context) {
 		return
 	}
 
+	input.AdoptionRequestedBy = 0
 	input.ID = nextAnimalID(animals)
 	animals = append(animals, input)
 
@@ -523,6 +539,142 @@ func loginUser(c *gin.Context) {
 	c.JSON(http.StatusUnauthorized, gin.H{"error": "Неверный email или пароль"})
 }
 
+func getUserFavorites(c *gin.Context) {
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректный ID пользователя"})
+		return
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	users, err := readUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось прочитать пользователей"})
+		return
+	}
+
+	for _, u := range users {
+		if u.ID == userID {
+			c.JSON(http.StatusOK, gin.H{"favorites": u.Favorites})
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{"error": "Пользователь не найден"})
+}
+
+func addFavorite(c *gin.Context) {
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректный ID пользователя"})
+		return
+	}
+
+	animalID, err := strconv.Atoi(c.Param("animalId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректный ID животного"})
+		return
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	users, err := readUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось прочитать пользователей"})
+		return
+	}
+
+	animals, err := readAnimals()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось прочитать животных"})
+		return
+	}
+
+	animalExists := false
+	for _, a := range animals {
+		if a.ID == animalID {
+			animalExists = true
+			break
+		}
+	}
+	if !animalExists {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Животное не найдено"})
+		return
+	}
+
+	for i, u := range users {
+		if u.ID == userID {
+			for _, favID := range u.Favorites {
+				if favID == animalID {
+					c.JSON(http.StatusOK, toSafeUser(users[i]))
+					return
+				}
+			}
+
+			users[i].Favorites = append(users[i].Favorites, animalID)
+
+			if err := writeUsers(users); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось сохранить избранное"})
+				return
+			}
+
+			c.JSON(http.StatusOK, toSafeUser(users[i]))
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{"error": "Пользователь не найден"})
+}
+
+func removeFavorite(c *gin.Context) {
+	userID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректный ID пользователя"})
+		return
+	}
+
+	animalID, err := strconv.Atoi(c.Param("animalId"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректный ID животного"})
+		return
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	users, err := readUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось прочитать пользователей"})
+		return
+	}
+
+	for i, u := range users {
+		if u.ID == userID {
+			filtered := make([]int, 0, len(u.Favorites))
+			for _, favID := range u.Favorites {
+				if favID != animalID {
+					filtered = append(filtered, favID)
+				}
+			}
+
+			users[i].Favorites = filtered
+
+			if err := writeUsers(users); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось сохранить избранное"})
+				return
+			}
+
+			c.JSON(http.StatusOK, toSafeUser(users[i]))
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{"error": "Пользователь не найден"})
+}
+
 // @Summary Получить животное по ID
 // @Description Возвращает одно животное по его ID
 // @Tags animals
@@ -605,6 +757,140 @@ func deleteAnimal(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Животное удалено"})
+}
+
+// @Summary Подать заявку на усыновление
+// @Description Создает заявку на усыновление животного и переводит его в статус pending
+// @Tags animals
+// @Accept json
+// @Produce json
+// @Param id path int true "ID животного"
+// @Param input body AdoptionRequestInput true "ID пользователя"
+// @Success 200 {object} Animal
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /animals/{id}/adopt-request [post]
+func requestAdoption(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректный ID животного"})
+		return
+	}
+
+	var input AdoptionRequestInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректные данные"})
+		return
+	}
+
+	if input.UserID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректный ID пользователя"})
+		return
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	animals, err := readAnimals()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось прочитать животных"})
+		return
+	}
+
+	for i, a := range animals {
+		if a.ID == id {
+			if a.Status != "available" {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Животное недоступно для усыновления"})
+				return
+			}
+
+			animals[i].Status = "pending"
+			animals[i].AdoptionRequestedBy = input.UserID
+
+			if err := writeAnimals(animals); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось сохранить заявку"})
+				return
+			}
+
+			c.JSON(http.StatusOK, animals[i])
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{"error": "Животное не найдено"})
+}
+
+
+// @Summary Изменить статус животного
+// @Description Обновляет статус животного: available, adopted или treatment
+// @Tags animals
+// @Accept json
+// @Produce json
+// @Param id path int true "ID животного"
+// @Param input body StatusUpdateInput true "Новый статус"
+// @Success 200 {object} Animal
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /animals/{id}/status [patch]
+func updateAnimalStatus(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректный ID"})
+		return
+	}
+
+	var input StatusUpdateInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректные данные"})
+		return
+	}
+
+	input.Status = strings.TrimSpace(strings.ToLower(input.Status))
+	if input.Status != "available" &&
+		input.Status != "pending" &&
+		input.Status != "adopted" &&
+		input.Status != "treatment" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Недопустимый статус"})
+		return
+	}
+	mu.Lock()
+	defer mu.Unlock()
+
+	animals, err := readAnimals()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось прочитать животных"})
+		return
+	}
+
+	for i, a := range animals {
+		if a.ID == id {
+			animals[i].Status = input.Status
+
+			if input.Status == "available" {
+				animals[i].AdoptionRequestedBy = 0
+			}
+
+			if input.Status == "adopted" {
+				// requester остается сохранённым, чтобы было видно, кто подал заявку
+			}
+
+			if input.Status == "treatment" && !containsFold(animals[i].Health, "леч") {
+				animals[i].Health = "На лечении"
+			}
+
+			if err := writeAnimals(animals); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось сохранить статус"})
+				return
+			}
+
+			c.JSON(http.StatusOK, animals[i])
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{"error": "Животное не найдено"})
 }
 
 // @Summary Получить аналитику

@@ -5,6 +5,8 @@ import Analytics from "./components/Analytics";
 import Classify from "./components/Classify";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import Favorites from "./components/Favorites";
+import Profile from "./components/Profile";
 
 export default function App() {
   const [page, setPage] = useState("home");
@@ -24,6 +26,10 @@ export default function App() {
 
   const handleRegisterSuccess = () => {
     setPage("login");
+  };
+
+  const handleUserUpdate = (updatedUser) => {
+    setUser(updatedUser);
   };
 
   const logout = () => {
@@ -48,9 +54,11 @@ export default function App() {
             Главная
           </button>
 
-          <button className="secondary-btn" onClick={() => setPage("add")}>
-            Добавить
-          </button>
+          {(user?.role === "admin" || user?.accountType === "owner") && (
+            <button className="secondary-btn" onClick={() => setPage("add")}>
+              Добавить
+            </button>
+          )}
 
           <button className="secondary-btn" onClick={() => setPage("classify")}>
             Классификация
@@ -62,6 +70,23 @@ export default function App() {
           >
             Аналитика
           </button>
+
+          {user && user.role !== "admin" && (
+            <>
+              <button
+                className="secondary-btn"
+                onClick={() => setPage("favorites")}
+              >
+                Избранные
+              </button>
+              <button
+                className="secondary-btn"
+                onClick={() => setPage("profile")}
+              >
+                Кабинет
+              </button>
+            </>
+          )}
 
           {!user && (
             <>
@@ -100,7 +125,9 @@ export default function App() {
       </header>
 
       <main className="page-content">
-        {page === "home" && <Home user={user} />}
+        {page === "home" && (
+          <Home user={user} onUserUpdate={handleUserUpdate} />
+        )}
         {page === "add" && <AddAnimal />}
         {page === "classify" && <Classify />}
         {page === "analytics" && <Analytics />}
@@ -108,6 +135,10 @@ export default function App() {
         {page === "register" && (
           <Register onRegisterSuccess={handleRegisterSuccess} />
         )}
+        {page === "favorites" && (
+          <Favorites user={user} onUserUpdate={handleUserUpdate} />
+        )}
+        {page === "profile" && <Profile user={user} />}
       </main>
     </div>
   );

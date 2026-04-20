@@ -23,10 +23,13 @@ export default function AddAnimal({ onSuccess }) {
     e.preventDefault();
 
     try {
+      const user = JSON.parse(localStorage.getItem("user"));
+
       const payload = {
         ...form,
         tags: [],
         status: form.health === "На лечении" ? "treatment" : "available",
+        ownerId: user?.id || 0,
       };
 
       await request("/animals", {

@@ -1,4 +1,5 @@
 import MyAnimals from "./MyAnimals";
+import MyRequests from "./MyRequests";
 
 export default function Profile({ user }) {
   if (!user) {
@@ -52,8 +53,14 @@ export default function Profile({ user }) {
       </div>
 
       {user.accountType === "owner" && (
-        <div style={{ marginTop: "20px" }}>
+        <div className="profile-section">
           <MyAnimals user={user} />
+        </div>
+      )}
+
+      {user.accountType === "adopter" && (
+        <div className="profile-section">
+          <MyRequests user={user} />
         </div>
       )}
     </section>

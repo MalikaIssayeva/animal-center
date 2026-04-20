@@ -41,6 +41,7 @@ type Animal struct {
 	Tags                []string `json:"tags,omitempty"`
 	OwnerID             int      `json:"ownerId"`
 	AdoptionRequestedBy int      `json:"adoptionRequestedBy"`
+	AdoptionDecision    string   `json:"adoptionDecision"`
 }
 
 type User struct {
@@ -416,6 +417,7 @@ func createAnimal(c *gin.Context) {
 	}
 
 	input.AdoptionRequestedBy = 0
+	input.AdoptionDecision = ""
 	input.ID = nextAnimalID(animals)
 	animals = append(animals, input)
 
@@ -805,8 +807,14 @@ func requestAdoption(c *gin.Context) {
 				return
 			}
 
+			if a.OwnerID == input.UserID {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Нельзя подать заявку на собственное животное"})
+				return
+			}
+
 			animals[i].Status = "pending"
 			animals[i].AdoptionRequestedBy = input.UserID
+			animals[i].AdoptionDecision = "pending"
 
 			if err := writeAnimals(animals); err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось сохранить заявку"})
@@ -868,12 +876,12 @@ func updateAnimalStatus(c *gin.Context) {
 		if a.ID == id {
 			animals[i].Status = input.Status
 
-			if input.Status == "available" {
-				animals[i].AdoptionRequestedBy = 0
+			if input.Status == "adopted" {
+				animals[i].AdoptionDecision = "approved"
 			}
 
-			if input.Status == "adopted" {
-				// requester остается сохранённым, чтобы было видно, кто подал заявку
+			if input.Status == "available" && animals[i].AdoptionRequestedBy != 0 {
+				animals[i].AdoptionDecision = "rejected"
 			}
 
 			if input.Status == "treatment" && !containsFold(animals[i].Health, "леч") {

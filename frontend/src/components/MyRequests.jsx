@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { request } from "../api";
 
-export default function MyAnimals({ user }) {
+export default function MyRequests({ user }) {
   const [animals, setAnimals] = useState([]);
 
-  const loadMyAnimals = async () => {
+  const loadMyRequests = async () => {
     try {
       const all = await request("/animals");
-      const mine = all.filter((a) => a.ownerId === user.id);
-      setAnimals(mine);
+      const requested = all.filter((a) => a.adoptionRequestedBy === user.id);
+      setAnimals(requested);
     } catch (err) {
       console.error(err);
     }
@@ -16,33 +16,33 @@ export default function MyAnimals({ user }) {
 
   useEffect(() => {
     if (user) {
-      loadMyAnimals();
+      loadMyRequests();
     }
   }, [user]);
 
   const getStatusLabel = (status) => {
-    if (status === "available") return "Доступен";
-    if (status === "pending") return "Ожидает подтверждения";
-    if (status === "adopted") return "Усыновлён";
+    if (status === "pending") return "Ожидает решения";
+    if (status === "adopted") return "Усыновление подтверждено";
+    if (status === "available") return "Снова доступно";
     if (status === "treatment") return "На лечении";
     return status;
   };
 
   const getStatusClass = (status) => {
-    if (status === "available") return "status-tag status-available";
     if (status === "pending") return "status-tag status-pending";
     if (status === "adopted") return "status-tag status-adopted";
+    if (status === "available") return "status-tag status-available";
     if (status === "treatment") return "status-tag status-treatment";
     return "status-tag";
   };
 
   if (!animals.length) {
-    return <div className="card">У вас пока нет добавленных животных.</div>;
+    return <div className="card">У вас пока нет заявок на усыновление.</div>;
   }
 
   return (
     <section className="profile-section">
-      <h3>Мои животные</h3>
+      <h3>Мои заявки</h3>
 
       <div className="animal-grid">
         {animals.map((a) => (
@@ -64,34 +64,21 @@ export default function MyAnimals({ user }) {
                 </span>
               </div>
 
-              {a.status === "pending" && a.adoptionRequestedBy > 0 && (
-                <p className="info-message info-blue">
-                  Подана заявка от пользователя #{a.adoptionRequestedBy}
+              {a.adoptionDecision === "pending" && (
+                <p className="request-message request-pending">
+                  Ваша заявка отправлена и ожидает решения администратора.
                 </p>
               )}
 
               {a.adoptionDecision === "approved" && (
-                <p className="info-message info-green">
-                  Заявка одобрена. Животное успешно усыновлено.
+                <p className="request-message request-approved">
+                  Ваша заявка одобрена. Усыновление подтверждено.
                 </p>
               )}
 
               {a.adoptionDecision === "rejected" && (
-                <p className="info-message info-orange">
-                  Заявка была отклонена. Животное снова доступно для
-                  усыновления.
-                </p>
-              )}
-
-              {a.status === "available" && !a.adoptionDecision && (
-                <p className="info-message info-green">
-                  Животное доступно для усыновления.
-                </p>
-              )}
-
-              {a.status === "treatment" && (
-                <p className="info-message info-orange">
-                  Животное временно недоступно, так как находится на лечении.
+                <p className="request-message request-rejected">
+                  Ваша заявка отклонена. Вы можете выбрать другое животное.
                 </p>
               )}
 

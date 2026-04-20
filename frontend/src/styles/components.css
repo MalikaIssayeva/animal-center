@@ -211,3 +211,179 @@
   background: var(--primary-soft);
   font-size: 14px;
 }
+
+.request-message {
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+.request-pending {
+  color: #4f46e5;
+}
+
+.request-approved {
+  color: #047857;
+}
+
+.request-rejected {
+  color: #b45309;
+}
+
+.profile-section {
+  margin-top: 20px;
+}
+
+.profile-main,
+.profile-stats {
+  min-height: 100%;
+}
+
+.profile-info p {
+  margin: 8px 0;
+}
+
+.profile-page h3 {
+  margin-top: 0;
+}
+
+.card-actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.card-actions select {
+  min-width: 170px;
+}
+
+.profile-page h2 {
+  margin-bottom: 16px;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+.profile-main {
+  padding: 20px;
+}
+
+.profile-stats {
+  padding: 20px;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.profile-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: var(--primary);
+  color: white;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-info p {
+  margin: 8px 0;
+}
+
+.profile-stat {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.profile-stat .stat-value {
+  font-size: 42px;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.profile-stat .stat-label {
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.profile-hint {
+  margin-top: 20px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--primary-soft);
+  font-size: 14px;
+}
+
+.profile-section {
+  margin-top: 20px;
+}
+
+.status-tag {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-available {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.status-pending {
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.status-adopted {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.status-treatment {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.request-message {
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+.request-pending {
+  color: #4f46e5;
+}
+
+.request-approved {
+  color: #047857;
+}
+
+.request-rejected {
+  color: #b45309;
+}
+
+.info-message {
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+.info-green {
+  color: #047857;
+}
+
+.info-blue {
+  color: #4f46e5;
+}
+
+.info-orange {
+  color: #b45309;
+}

@@ -243,17 +243,61 @@ export default function Home({ user, onUserUpdate }) {
                     <span className="tag">{getStatusLabel(a.status)}</span>
                   </div>
 
-                  {a.status === "pending" && a.adoptionRequestedBy > 0 && (
-                    <p
-                      style={{
-                        marginTop: "10px",
-                        color: "#4f46e5",
-                        fontWeight: 600,
-                      }}
-                    >
-                      Заявка от пользователя #{a.adoptionRequestedBy}
-                    </p>
-                  )}
+                  {(user?.role === "admin" || a.ownerId === user?.id) &&
+                    a.status === "pending" &&
+                    a.adoptionRequestedBy > 0 && (
+                      <p
+                        style={{
+                          marginTop: "10px",
+                          color: "#4f46e5",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Заявка от пользователя #{a.adoptionRequestedBy}
+                      </p>
+                    )}
+
+                  {user?.accountType === "adopter" &&
+                    a.adoptionRequestedBy === user.id &&
+                    a.adoptionDecision === "approved" && (
+                      <p
+                        style={{
+                          marginTop: "10px",
+                          color: "#047857",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Ваша заявка одобрена. Усыновление подтверждено.
+                      </p>
+                    )}
+
+                  {user?.accountType === "adopter" &&
+                    a.adoptionRequestedBy === user.id &&
+                    a.adoptionDecision === "rejected" && (
+                      <p
+                        style={{
+                          marginTop: "10px",
+                          color: "#b45309",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Ваша заявка отклонена.
+                      </p>
+                    )}
+
+                  {user?.accountType === "adopter" &&
+                    a.adoptionRequestedBy === user.id &&
+                    a.adoptionDecision === "pending" && (
+                      <p
+                        style={{
+                          marginTop: "10px",
+                          color: "#4f46e5",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Ваша заявка отправлена и ожидает решения администратора.
+                      </p>
+                    )}
 
                   <p style={{ marginTop: "10px" }}>{a.description || ""}</p>
 
@@ -269,7 +313,8 @@ export default function Home({ user, onUserUpdate }) {
                     )}
 
                     {user?.accountType === "adopter" &&
-                      a.status === "available" && (
+                      a.status === "available" &&
+                      a.ownerId !== user.id && (
                         <button
                           type="button"
                           className="primary-btn"

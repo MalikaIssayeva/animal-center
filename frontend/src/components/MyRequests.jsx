@@ -29,15 +29,19 @@ export default function MyRequests({ user }) {
   };
 
   const getStatusClass = (status) => {
-    if (status === "pending") return "status-tag status-pending";
-    if (status === "adopted") return "status-tag status-adopted";
-    if (status === "available") return "status-tag status-available";
-    if (status === "treatment") return "status-tag status-treatment";
-    return "status-tag";
+    if (status === "pending") return "status-pill status-pending";
+    if (status === "adopted") return "status-pill status-adopted";
+    if (status === "available") return "status-pill status-available";
+    if (status === "treatment") return "status-pill status-treatment";
+    return "status-pill";
   };
 
   if (!animals.length) {
-    return <div className="card">У вас пока нет заявок на усыновление.</div>;
+    return (
+      <div className="card empty-state">
+        У вас пока нет заявок на усыновление.
+      </div>
+    );
   }
 
   return (
@@ -52,7 +56,7 @@ export default function MyRequests({ user }) {
             <div className="animal-content">
               <h4>{a.name}</h4>
 
-              <p>
+              <p className="animal-meta">
                 {a.breed}, {a.age}
               </p>
 
@@ -65,24 +69,24 @@ export default function MyRequests({ user }) {
               </div>
 
               {a.adoptionDecision === "pending" && (
-                <p className="request-message request-pending">
+                <div className="notice-box notice-pending">
                   Ваша заявка отправлена и ожидает решения администратора.
-                </p>
+                </div>
               )}
 
               {a.adoptionDecision === "approved" && (
-                <p className="request-message request-approved">
+                <div className="notice-box notice-approved">
                   Ваша заявка одобрена. Усыновление подтверждено.
-                </p>
+                </div>
               )}
 
               {a.adoptionDecision === "rejected" && (
-                <p className="request-message request-rejected">
+                <div className="notice-box notice-rejected">
                   Ваша заявка отклонена. Вы можете выбрать другое животное.
-                </p>
+                </div>
               )}
 
-              <p style={{ marginTop: "10px" }}>{a.description || ""}</p>
+              {a.description && <p className="animal-desc">{a.description}</p>}
             </div>
           </article>
         ))}

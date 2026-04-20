@@ -14,7 +14,7 @@
   border-radius: 12px;
   padding: 12px 18px;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .primary-btn {
@@ -22,9 +22,17 @@
   color: white;
 }
 
+.primary-btn:hover {
+  background: #7481a7;
+}
+
 .secondary-btn {
   background: var(--primary-soft);
   color: var(--primary);
+}
+
+.secondary-btn:hover {
+  background: #b8c9eb;
 }
 
 .full {
@@ -82,7 +90,7 @@
   display: inline-block;
   padding: 6px 10px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 18px;
 }
 
 .badge {
@@ -91,8 +99,8 @@
 }
 
 .tag {
-  background: #eef2ff;
-  color: #3653c7;
+  background: #95b1e4;
+  color: #070707;
 }
 
 .status-pill.warning {
@@ -106,12 +114,24 @@
 }
 
 .animal-card {
+  background: #fff;
+  border: 1px solid #dce3ea;
+  border-radius: 22px;
   overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.animal-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
 }
 
 .animal-image {
-  background: #eef7f2;
-  height: 150px;
+  background: #e4f0f8;
+  height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -119,17 +139,18 @@
 }
 
 .animal-content {
-  padding: 14px;
+  padding: 18px;
 }
 
 .animal-content h4 {
   margin: 0 0 6px;
-  font-size: 22px;
+  font-size: 30px;
 }
 
 .animal-content p {
   margin: 0 0 10px;
-  color: var(--muted);
+  color: #5f6b66;
+  font-size: 17px;
 }
 
 .animal-content button {
@@ -153,97 +174,52 @@
 
 .profile-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 16px;
+  grid-template-columns: 2fr 1.15fr;
+  gap: 20px;
 }
 
-.profile-main {
-  padding: 20px;
+.profile-main,
+.profile-stats {
+  background: #fff;
+  border: 1px solid #dce3de;
+  border-radius: 24px;
+  padding: 26px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
 }
 
 .profile-header {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 16px;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .profile-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 16px;
-  background: var(--primary);
-  color: white;
-  font-size: 28px;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: #cadbe6;
+  color: #0a3769;
+  font-size: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.profile-info p {
-  margin: 6px 0;
+.profile-header h3 {
+  margin: 0;
+  font-size: 34px;
 }
 
-.profile-stats {
-  padding: 20px;
-}
-
-.profile-stat {
-  text-align: center;
-  margin-top: 20px;
-}
-
-.profile-stat .stat-value {
-  font-size: 42px;
-  font-weight: bold;
-  color: var(--primary);
-}
-
-.profile-stat .stat-label {
-  color: var(--muted);
-  margin-top: 6px;
-}
-
-.profile-hint {
-  margin-top: 20px;
-  padding: 12px;
-  border-radius: 12px;
-  background: var(--primary-soft);
-  font-size: 14px;
-}
-
-.request-message {
-  margin-top: 10px;
-  font-weight: 600;
-}
-
-.request-pending {
-  color: #4f46e5;
-}
-
-.request-approved {
-  color: #047857;
-}
-
-.request-rejected {
-  color: #b45309;
-}
-
-.profile-section {
-  margin-top: 20px;
-}
-
-.profile-main,
-.profile-stats {
-  min-height: 100%;
+.profile-header p {
+  margin: 4px 0 0;
+  color: #6b7280;
+  font-size: 18px;
 }
 
 .profile-info p {
-  margin: 8px 0;
-}
-
-.profile-page h3 {
-  margin-top: 0;
+  margin: 10px 0;
+  font-size: 22px;
 }
 
 .card-actions {
@@ -280,18 +256,6 @@
   align-items: center;
   gap: 14px;
   margin-bottom: 16px;
-}
-
-.profile-avatar {
-  width: 60px;
-  height: 60px;
-  border-radius: 16px;
-  background: var(--primary);
-  color: white;
-  font-size: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .profile-info p {
@@ -386,4 +350,82 @@
 
 .info-orange {
   color: #b45309;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.status-available {
+  background: #dff3e5;
+  color: #2f8f4e;
+}
+
+.status-pending {
+  background: #dfe9ff;
+  color: #3f63c9;
+}
+
+.status-adopted {
+  background: #f2dcea;
+  color: #b24b83;
+}
+
+.status-treatment {
+  background: #fff0df;
+  color: #d66a1f;
+}
+
+.notice-box {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.notice-approved {
+  background: #e4f3e5;
+  color: #2f8f4e;
+  border-left: 4px solid #3ba84e;
+}
+
+.notice-rejected {
+  background: #f8ead8;
+  color: #df6c14;
+  border-left: 4px solid #ff8a1f;
+}
+
+.notice-pending {
+  background: #e6edff;
+  color: #4564c8;
+  border-left: 4px solid #5c76d8;
+}
+
+.animal-meta {
+  color: #5f6b66;
+  margin-bottom: 8px;
+  font-size: 22px;
+}
+
+.animal-desc {
+  margin-top: 2rem;
+  color: #374151;
+  font-size: 22px;
+}
+
+.status-row {
+  margin-top: 8px;
+  margin-bottom: 6px;
+}
+
+.empty-state {
+  padding: 24px;
+  text-align: center;
+  color: #6b7280;
 }

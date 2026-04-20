@@ -9,10 +9,10 @@
     "health": "Здоров",
     "description": "Дружелюбный и спокойный пес.",
     "image": "🐶",
-    "status": "pending",
+    "status": "available",
     "ownerId": 0,
     "adoptionRequestedBy": 1,
-    "adoptionDecision": ""
+    "adoptionDecision": "rejected"
   },
   {
     "id": 2,
@@ -84,10 +84,10 @@
     "health": "Здоров",
     "description": "Спокойный и сильный.",
     "image": "🐶",
-    "status": "available",
+    "status": "adopted",
     "ownerId": 0,
-    "adoptionRequestedBy": 0,
-    "adoptionDecision": ""
+    "adoptionRequestedBy": 5,
+    "adoptionDecision": "approved"
   },
   {
     "id": 7,
@@ -251,8 +251,8 @@
     "image": "🐈",
     "status": "available",
     "ownerId": 0,
-    "adoptionRequestedBy": 0,
-    "adoptionDecision": ""
+    "adoptionRequestedBy": 5,
+    "adoptionDecision": "rejected"
   },
   {
     "id": 18,
@@ -429,10 +429,10 @@
     "health": "Здоров",
     "description": "Активный и веселый.",
     "image": "🐹",
-    "status": "available",
+    "status": "adopted",
     "ownerId": 0,
     "adoptionRequestedBy": 5,
-    "adoptionDecision": "rejected"
+    "adoptionDecision": "approved"
   },
   {
     "id": 31,

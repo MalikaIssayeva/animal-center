@@ -59,7 +59,7 @@ export default function Favorites({ user, onUserUpdate }) {
 
               <div className="animal-content">
                 <h4>{a.name}</h4>
-                <p>
+                <p className="animal-meta">
                   {a.breed}, {a.age}
                 </p>
 
@@ -68,7 +68,60 @@ export default function Favorites({ user, onUserUpdate }) {
                   <span className="tag">{a.type}</span>
                 </div>
 
-                <p style={{ marginTop: "10px" }}>{a.description || ""}</p>
+                {/* 👉 статус животного */}
+                <div className="status-row">
+                  {a.status === "available" && (
+                    <span className="status-pill status-available">
+                      Доступен
+                    </span>
+                  )}
+
+                  {a.status === "pending" && (
+                    <span className="status-pill status-pending">
+                      Есть заявка
+                    </span>
+                  )}
+
+                  {a.status === "adopted" && (
+                    <span className="status-pill status-adopted">
+                      Усыновлён
+                    </span>
+                  )}
+
+                  {a.status === "treatment" && (
+                    <span className="status-pill status-treatment">
+                      На лечении
+                    </span>
+                  )}
+                </div>
+
+                {/* описание */}
+                {a.description && (
+                  <p className="animal-desc">{a.description}</p>
+                )}
+
+                {/* статус заявки пользователя */}
+                {a.adoptionRequestedBy === user?.id && (
+                  <>
+                    {a.adoptionDecision === "pending" && (
+                      <div className="notice-box notice-pending">
+                        Заявка отправлена. Ожидайте решения.
+                      </div>
+                    )}
+
+                    {a.adoptionDecision === "approved" && (
+                      <div className="notice-box notice-approved">
+                        Усыновление подтверждено
+                      </div>
+                    )}
+
+                    {a.adoptionDecision === "rejected" && (
+                      <div className="notice-box notice-rejected">
+                        Заявка отклонена
+                      </div>
+                    )}
+                  </>
+                )}
 
                 <div className="card-actions">
                   <button
@@ -83,7 +136,9 @@ export default function Favorites({ user, onUserUpdate }) {
             </article>
           ))
         ) : (
-          <div className="card">У вас пока нет избранных животных.</div>
+          <div className="card empty-state">
+            У вас пока нет избранных животных 🐾
+          </div>
         )}
       </div>
     </section>

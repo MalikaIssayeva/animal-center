@@ -29,15 +29,19 @@ export default function MyAnimals({ user }) {
   };
 
   const getStatusClass = (status) => {
-    if (status === "available") return "status-tag status-available";
-    if (status === "pending") return "status-tag status-pending";
-    if (status === "adopted") return "status-tag status-adopted";
-    if (status === "treatment") return "status-tag status-treatment";
-    return "status-tag";
+    if (status === "available") return "status-pill status-available";
+    if (status === "pending") return "status-pill status-pending";
+    if (status === "adopted") return "status-pill status-adopted";
+    if (status === "treatment") return "status-pill status-treatment";
+    return "status-pill";
   };
 
   if (!animals.length) {
-    return <div className="card">У вас пока нет добавленных животных.</div>;
+    return (
+      <div className="card empty-state">
+        У вас пока нет добавленных животных.
+      </div>
+    );
   }
 
   return (
@@ -52,7 +56,7 @@ export default function MyAnimals({ user }) {
             <div className="animal-content">
               <h4>{a.name}</h4>
 
-              <p>
+              <p className="animal-meta">
                 {a.breed}, {a.age}
               </p>
 
@@ -65,37 +69,37 @@ export default function MyAnimals({ user }) {
               </div>
 
               {a.status === "pending" && a.adoptionRequestedBy > 0 && (
-                <p className="info-message info-blue">
+                <div className="notice-box notice-pending">
                   Подана заявка от пользователя #{a.adoptionRequestedBy}
-                </p>
+                </div>
               )}
 
               {a.adoptionDecision === "approved" && (
-                <p className="info-message info-green">
+                <div className="notice-box notice-approved">
                   Заявка одобрена. Животное успешно усыновлено.
-                </p>
+                </div>
               )}
 
               {a.adoptionDecision === "rejected" && (
-                <p className="info-message info-orange">
+                <div className="notice-box notice-rejected">
                   Заявка была отклонена. Животное снова доступно для
                   усыновления.
-                </p>
+                </div>
               )}
 
               {a.status === "available" && !a.adoptionDecision && (
-                <p className="info-message info-green">
+                <div className="notice-box notice-approved">
                   Животное доступно для усыновления.
-                </p>
+                </div>
               )}
 
               {a.status === "treatment" && (
-                <p className="info-message info-orange">
+                <div className="notice-box notice-rejected">
                   Животное временно недоступно, так как находится на лечении.
-                </p>
+                </div>
               )}
 
-              <p style={{ marginTop: "10px" }}>{a.description || ""}</p>
+              {a.description && <p className="animal-desc">{a.description}</p>}
             </div>
           </article>
         ))}

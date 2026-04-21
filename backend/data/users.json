@@ -41,26 +41,20 @@
   },
   {
     "id": 5,
-    "name": "Mikey",
+    "name": "Малика",
     "email": "malika.2mgroup@gmail.com",
-    "password": "12345",
+    "password": "123456",
     "role": "user",
     "accountType": "adopter",
-    "favorites": [
-      28,
-      27
-    ]
+    "favorites": []
   },
   {
     "id": 6,
-    "name": "malika",
+    "name": "Mikey",
     "email": "craigtuckerxtweaktweek@gmail.com",
-    "password": "12345",
+    "password": "123456",
     "role": "user",
     "accountType": "owner",
-    "favorites": [
-      24,
-      28
-    ]
+    "favorites": []
   }
 ]

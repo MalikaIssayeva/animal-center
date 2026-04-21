@@ -95,6 +95,14 @@ export default function AddAnimal({ onSuccess }) {
         type,
         confidence: data?.confidence ?? 0,
       });
+
+      // 🔥 гибрид: тип подставляем сразу
+      if (type !== "Не удалось уверенно определить тип") {
+        setForm((prev) => ({
+          ...prev,
+          type,
+        }));
+      }
     } catch (err) {
       console.error(err);
       alert("Ошибка ML");
@@ -106,9 +114,10 @@ export default function AddAnimal({ onSuccess }) {
   const applyPrediction = () => {
     if (!prediction) return;
 
+    // 🔥 гибрид: по кнопке подставляем только породу
     setForm((prev) => ({
       ...prev,
-      type: prediction.type,
+      breed: translateLabel(prediction.raw),
     }));
   };
 
@@ -183,13 +192,18 @@ export default function AddAnimal({ onSuccess }) {
               <strong>Уверенность:</strong> {prediction.confidence}%
             </p>
 
+            <p className="muted">
+              Тип уже подставлен в форму автоматически. Породу можно добавить по
+              кнопке ниже.
+            </p>
+
             {prediction.type !== "Не удалось уверенно определить тип" && (
               <button
                 type="button"
                 className="primary-btn"
                 onClick={applyPrediction}
               >
-                Использовать результат
+                Подставить породу
               </button>
             )}
           </div>

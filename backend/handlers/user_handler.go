@@ -38,6 +38,11 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
+	if len(input.Password) < 6 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Пароль должен содержать минимум 6 символов"})
+		return
+	}
+
 	if input.AccountType != "owner" && input.AccountType != "adopter" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Тип аккаунта должен быть owner или adopter"})
 		return

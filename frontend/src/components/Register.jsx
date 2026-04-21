@@ -9,7 +9,10 @@ export default function Register({ onRegisterSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    if (password.length < 6) {
+      alert("Пароль должен содержать минимум 6 символов");
+      return;
+    }
     try {
       await request("/register", {
         method: "POST",
@@ -58,6 +61,7 @@ export default function Register({ onRegisterSuccess }) {
           <input
             type="password"
             placeholder="Пароль"
+            minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />

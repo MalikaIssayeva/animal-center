@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { request } from "../api";
 
 function translateLabel(label) {
@@ -65,6 +65,7 @@ export default function AddAnimal({ onSuccess }) {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const handleChange = (e) => {
     setForm((prev) => ({
@@ -72,6 +73,18 @@ export default function AddAnimal({ onSuccess }) {
       [e.target.name]: e.target.value,
     }));
   };
+
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl(null);
+      return;
+    }
+
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
 
   const handleClassify = async () => {
     setError("");
@@ -183,132 +196,139 @@ export default function AddAnimal({ onSuccess }) {
     <section>
       <h2>Добавить животное</h2>
 
-      <form className="card form-card" onSubmit={handleSubmit}>
-        <label>
-          Фото животного
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              setFile(e.target.files?.[0] || null);
-              setError("");
-              setSuccess("");
-            }}
-          />
-        </label>
-
-        <button
-          type="button"
-          className="secondary-btn"
-          onClick={handleClassify}
-          disabled={loadingML}
-        >
-          {loadingML ? "Определение..." : "Определить по фото"}
-        </button>
-
-        {prediction && (
-          <div className="ml-result">
-            <p>
-              <strong>Тип:</strong> {prediction.type}
-            </p>
-            <p>
-              <strong>Метка модели:</strong> {translateLabel(prediction.raw)}
-            </p>
-            <p>
-              <strong>Уверенность:</strong> {prediction.confidence}%
-            </p>
-
-            <p className="muted">
-              Тип уже подставлен в форму автоматически. Породу можно добавить по
-              кнопке ниже.
-            </p>
-
-            {prediction.type !== "Не удалось уверенно определить тип" && (
-              <button
-                type="button"
-                className="primary-btn"
-                onClick={applyPrediction}
-              >
-                Подставить породу
-              </button>
-            )}
-          </div>
-        )}
-
-        {error && <div className="form-error">{error}</div>}
-        {success && <div className="form-success">{success}</div>}
-
-        <div className="form-row two-cols">
+      <div className="AddAnimal-section">
+        <form className="card form-card" onSubmit={handleSubmit}>
           <label>
-            Кличка
+            Фото животного
             <input
-              name="name"
-              required
-              value={form.name}
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                setFile(e.target.files?.[0] || null);
+                setError("");
+                setSuccess("");
+              }}
+            />
+            {previewUrl && (
+              <div className="preview-box">
+                <img src={previewUrl} alt="preview" className="preview-image" />
+              </div>
+            )}
+          </label>
+
+          <button
+            type="button"
+            className="secondary-btn"
+            onClick={handleClassify}
+            disabled={loadingML}
+          >
+            {loadingML ? "Определение..." : "Определить по фото"}
+          </button>
+
+          {prediction && (
+            <div className="ml-result">
+              <p>
+                <strong>Тип:</strong> {prediction.type}
+              </p>
+              <p>
+                <strong>Метка модели:</strong> {translateLabel(prediction.raw)}
+              </p>
+              <p>
+                <strong>Уверенность:</strong> {prediction.confidence}%
+              </p>
+
+              <p className="muted">
+                Тип уже подставлен в форму автоматически. Породу можно добавить
+                по кнопке ниже.
+              </p>
+
+              {prediction.type !== "Не удалось уверенно определить тип" && (
+                <button
+                  type="button"
+                  className="primary-btn"
+                  onClick={applyPrediction}
+                >
+                  Подставить породу
+                </button>
+              )}
+            </div>
+          )}
+
+          {error && <div className="form-error">{error}</div>}
+          {success && <div className="form-success">{success}</div>}
+
+          <div className="form-row two-cols">
+            <label>
+              Кличка
+              <input
+                name="name"
+                required
+                value={form.name}
+                onChange={handleChange}
+              />
+            </label>
+
+            <label>
+              Вид
+              <select name="type" value={form.type} onChange={handleChange}>
+                <option>Собака</option>
+                <option>Кошка</option>
+                <option>Птица</option>
+                <option>Хомяк</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="form-row two-cols">
+            <label>
+              Порода
+              <input name="breed" value={form.breed} onChange={handleChange} />
+            </label>
+
+            <label>
+              Возраст
+              <input name="age" value={form.age} onChange={handleChange} />
+            </label>
+          </div>
+
+          <div className="form-row two-cols">
+            <label>
+              Пол
+              <select name="gender" value={form.gender} onChange={handleChange}>
+                <option>Самец</option>
+                <option>Самка</option>
+              </select>
+            </label>
+
+            <label>
+              Статус здоровья
+              <select name="health" value={form.health} onChange={handleChange}>
+                <option>Здоров</option>
+                <option>На лечении</option>
+                <option>Стерилизована</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            Описание
+            <textarea
+              name="description"
+              rows="4"
+              value={form.description}
               onChange={handleChange}
             />
           </label>
 
-          <label>
-            Вид
-            <select name="type" value={form.type} onChange={handleChange}>
-              <option>Собака</option>
-              <option>Кошка</option>
-              <option>Птица</option>
-              <option>Хомяк</option>
-            </select>
-          </label>
-        </div>
-
-        <div className="form-row two-cols">
-          <label>
-            Порода
-            <input name="breed" value={form.breed} onChange={handleChange} />
-          </label>
-
-          <label>
-            Возраст
-            <input name="age" value={form.age} onChange={handleChange} />
-          </label>
-        </div>
-
-        <div className="form-row two-cols">
-          <label>
-            Пол
-            <select name="gender" value={form.gender} onChange={handleChange}>
-              <option>Самец</option>
-              <option>Самка</option>
-            </select>
-          </label>
-
-          <label>
-            Статус здоровья
-            <select name="health" value={form.health} onChange={handleChange}>
-              <option>Здоров</option>
-              <option>На лечении</option>
-              <option>Стерилизована</option>
-            </select>
-          </label>
-        </div>
-
-        <label>
-          Описание
-          <textarea
-            name="description"
-            rows="4"
-            value={form.description}
-            onChange={handleChange}
-          />
-        </label>
-
-        <button
-          className="primary-btn full"
-          type="submit"
-          disabled={loadingSubmit}
-        >
-          {loadingSubmit ? "Сохранение..." : "Сохранить животное"}
-        </button>
-      </form>
+          <button
+            className="primary-btn full"
+            type="submit"
+            disabled={loadingSubmit}
+          >
+            {loadingSubmit ? "Сохранение..." : "Сохранить животное"}
+          </button>
+        </form>
+      </div>
     </section>
   );
 }

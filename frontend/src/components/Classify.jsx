@@ -185,11 +185,6 @@ export default function Classify() {
                 </p>
 
                 <p>
-                  <strong>Состояние:</strong>{" "}
-                  {result.healthStatus || "Не определено"}
-                </p>
-
-                <p>
                   <strong>Уверенность:</strong> {result.confidence ?? 0}%
                 </p>
               </div>

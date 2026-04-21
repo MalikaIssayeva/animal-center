@@ -1,5 +1,12 @@
+.AddAnimal-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .form-card {
-  max-width: 720px;
+  width: 100%;
+  max-width: 800px;
 }
 
 .form-row {

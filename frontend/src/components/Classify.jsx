@@ -13,6 +13,12 @@ function translateLabel(label) {
     labrador_retriever: "Лабрадор-ретривер",
     german_shepherd: "Немецкая овчарка",
     siberian_husky: "Сибирский хаски",
+    eskimo_dog: "Эскимосская собака",
+    malamute: "Аляскинский маламут",
+    flat_coated_retriever: "Прямошёрстный ретривер",
+    weimaraner: "Веймаранер",
+    great_dane: "Немецкий дог",
+    rottweiler: "Ротвейлер",
     beagle: "Бигль",
     french_bulldog: "Французский бульдог",
     english_bulldog: "Английский бульдог",
@@ -36,6 +42,29 @@ function translateLabel(label) {
     lorikeet: "Лорикет",
     parrot: "Попугай",
     canary: "Канарейка",
+    eagle: "Орёл",
+    bald_eagle: "Белоголовый орлан",
+    american_egret: "Американская цапля",
+    pelican: "Пеликан",
+    goose: "Гусь",
+    black_swan: "Чёрный лебедь",
+    kite: "Коршун",
+    vulture: "Гриф",
+    great_grey_owl: "Бородатая неясыть",
+    house_finch: "Домовый вьюрок",
+    black_grouse: "Тетерев",
+    bustard: "Дрофа",
+    bittern: "Выпь",
+    coucal: "Кукаль",
+    spoonbill: "Колпица",
+    standard_poodle: "Большой пудель",
+    miniature_poodle: "Миниатюрный пудель",
+    staffordshire_bullterrier: "Стаффордширский бультерьер",
+    german_short_haired_pointer: "Курцхаар",
+    ibizan_hound: "Ивисская борзая",
+    mexican_hairless: "Ксолоитцкуинтли",
+    american_egret: "Американская белая цапля",
+    angora: "Ангорская кошка",
   };
 
   const normalized = label.toLowerCase().replaceAll(" ", "_").trim();
@@ -107,6 +136,8 @@ export default function Classify() {
     result?.alternatives?.[0]?.label ||
     result?.predictedBreed ||
     "Не определено";
+
+  const isLowConfidence = (result?.confidence ?? 0) < 30;
 
   return (
     <section className="classify-page">
@@ -193,6 +224,13 @@ export default function Classify() {
                 Результат модели является вспомогательной подсказкой и может
                 быть использован при добавлении карточки животного.
               </div>
+
+              {isLowConfidence && (
+                <div className="notice-box notice-rejected">
+                  Уверенность модели низкая. Рекомендуется проверить тип и
+                  породу вручную.
+                </div>
+              )}
 
               {!!result.alternatives?.length && (
                 <div className="alternatives-box">

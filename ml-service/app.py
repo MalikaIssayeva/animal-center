@@ -33,15 +33,27 @@ transform = transforms.Compose([
 DOG_HINTS = [
     "dog", "chihuahua", "terrier", "pinscher", "retriever", "poodle",
     "bulldog", "beagle", "husky", "spaniel", "shepherd", "corgi",
-    "mastiff", "boxer", "dalmatian", "kelpie", "labrador"
+    "mastiff", "boxer", "dalmatian", "kelpie", "labrador", "malamute",
+    "rottweiler", "weimaraner", "great dane", "eskimo dog"
 ]
 
 CAT_HINTS = [
-    "cat", "kitten", "tabby", "persian", "siamese", "egyptian", "lynx"
+    "cat", "kitten",
+    "tabby", "tiger cat", "striped cat",
+    "persian", "siamese", "egyptian", "egyptian cat",
+    "lynx",
+    "maine coon", "british shorthair", "scottish fold",
+    "ragdoll", "bengal", "sphynx", "abyssinian",
+    "burmese", "oriental", "savannah",
+    "norwegian forest", "devon rex", "cornish rex"
 ]
 
 BIRD_HINTS = [
-    "bird", "parrot", "cockatoo", "macaw", "lorikeet", "canary"
+    "bird", "parrot", "cockatoo", "macaw", "lorikeet", "canary",
+    "eagle", "bald eagle", "kite", "vulture", "owl", "falcon", "hawk",
+    "egret", "pelican", "goose", "swan", "duck", "flamingo",
+    "grouse", "finch", "bustard", "black grouse", "house finch",
+    "coucal", "spoonbill", "bittern"
 ]
 
 HAMSTER_HINTS = [
@@ -49,8 +61,8 @@ HAMSTER_HINTS = [
 ]
 
 
-def detect_type_from_label(label: str) -> str:
-    label_lower = label.lower()
+def classify_group(label: str) -> str | None:
+    label_lower = label.lower().replace("_", " ").replace("-", " ")
 
     if any(hint in label_lower for hint in DOG_HINTS):
         return "Собака"
@@ -61,7 +73,7 @@ def detect_type_from_label(label: str) -> str:
     if any(hint in label_lower for hint in HAMSTER_HINTS):
         return "Хомяк"
 
-    return "Не удалось уверенно определить тип"
+    return None
 
 
 @app.get("/health")
@@ -83,12 +95,16 @@ async def predict(file: UploadFile = File(...)):
     top5 = torch.topk(probabilities, 5)
 
     alternatives = []
-    predicted_type = "Не удалось уверенно определить тип"
-    best_conf = 0
+    type_scores = {
+        "Собака": 0.0,
+        "Кошка": 0.0,
+        "Птица": 0.0,
+        "Хомяк": 0.0,
+    }
 
     for i in range(5):
         class_id = top5.indices[i].item()
-        confidence = top5.values[i].item()
+        confidence = float(top5.values[i].item())
         label = imagenet_classes[str(class_id)][1]
 
         alternatives.append({
@@ -96,23 +112,31 @@ async def predict(file: UploadFile = File(...)):
             "confidence": int(confidence * 100)
         })
 
-        detected_type = detect_type_from_label(label)
-        if detected_type != "Не удалось уверенно определить тип" and confidence > best_conf:
-            predicted_type = detected_type
-            best_conf = confidence
+        detected_group = classify_group(label)
+        if detected_group:
+            type_scores[detected_group] += confidence
 
-    if predicted_type == "Не удалось уверенно определить тип" and alternatives:
-        fallback_type = detect_type_from_label(alternatives[0]["label"])
-        if fallback_type != "Не удалось уверенно определить тип":
-            predicted_type = fallback_type
-            best_conf = top5.values[0].item()
+    predicted_type = "Не удалось уверенно определить тип"
+    best_type = max(type_scores, key=type_scores.get)
+    best_type_score = type_scores[best_type]
+
+    if best_type_score > 0:
+        predicted_type = best_type
+
+    top_label_confidence = int(float(top5.values[0].item()) * 100)
+
+    cleaned_alternatives = [
+        item for item in alternatives
+        if item["confidence"] >= 5
+    ]
+
+    if not cleaned_alternatives:
+        cleaned_alternatives = alternatives[:3]
 
     return {
         "predictedType": predicted_type,
         "predictedBreed": alternatives[0]["label"] if alternatives else "Не определено",
-        "ageCategory": "Не определено",
-        "healthStatus": "Не определено",
-        "confidence": int(best_conf * 100),
+        "confidence": top_label_confidence,
         "fileName": file.filename,
-        "alternatives": alternatives,
+        "alternatives": cleaned_alternatives,
     }

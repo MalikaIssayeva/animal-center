@@ -4,20 +4,32 @@ import { request } from "../api";
 export default function Login({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
+    if (!email.trim() || !password.trim()) {
+      setError("Введите email и пароль");
+      return;
+    }
 
     try {
+      setLoading(true);
+
       const user = await request("/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
 
       localStorage.setItem("user", JSON.stringify(user));
-      onLogin(user);
+      onLogin?.(user);
     } catch (err) {
-      alert("Ошибка входа");
+      setError(err.message || "Ошибка входа");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -42,8 +54,10 @@ export default function Login({ onLogin }) {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          <button className="primary-btn full" type="submit">
-            Войти
+          {error && <div className="form-error">{error}</div>}
+
+          <button className="primary-btn full" type="submit" disabled={loading}>
+            {loading ? "Вход..." : "Войти"}
           </button>
         </form>
       </div>

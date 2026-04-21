@@ -62,6 +62,9 @@ export default function AddAnimal({ onSuccess }) {
   const [file, setFile] = useState(null);
   const [prediction, setPrediction] = useState(null);
   const [loadingML, setLoadingML] = useState(false);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleChange = (e) => {
     setForm((prev) => ({
@@ -71,8 +74,11 @@ export default function AddAnimal({ onSuccess }) {
   };
 
   const handleClassify = async () => {
+    setError("");
+    setSuccess("");
+
     if (!file) {
-      alert("Сначала выбери фото");
+      setError("Сначала выберите фото.");
       return;
     }
 
@@ -104,7 +110,7 @@ export default function AddAnimal({ onSuccess }) {
       }
     } catch (err) {
       console.error(err);
-      alert("Ошибка ML");
+      setError(err.message || "Не удалось определить животное по фото.");
     } finally {
       setLoadingML(false);
     }
@@ -113,7 +119,6 @@ export default function AddAnimal({ onSuccess }) {
   const applyPrediction = () => {
     if (!prediction) return;
 
-    // 🔥 гибрид: по кнопке подставляем только породу
     setForm((prev) => ({
       ...prev,
       breed: translateLabel(prediction.raw),
@@ -122,8 +127,24 @@ export default function AddAnimal({ onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (
+      !form.name.trim() ||
+      !form.type.trim() ||
+      !form.breed.trim() ||
+      !form.age.trim() ||
+      !form.gender.trim() ||
+      !form.health.trim()
+    ) {
+      setError("Заполните обязательные поля.");
+      return;
+    }
 
     try {
+      setLoadingSubmit(true);
+
       const payload = {
         ...form,
         tags: [],
@@ -147,12 +168,14 @@ export default function AddAnimal({ onSuccess }) {
 
       setFile(null);
       setPrediction(null);
+      setSuccess("Животное успешно добавлено.");
 
-      alert("Животное добавлено");
       onSuccess?.();
     } catch (error) {
       console.error(error);
-      alert("Не удалось добавить животное");
+      setError(error.message || "Не удалось добавить животное.");
+    } finally {
+      setLoadingSubmit(false);
     }
   };
 
@@ -166,7 +189,11 @@ export default function AddAnimal({ onSuccess }) {
           <input
             type="file"
             accept="image/*"
-            onChange={(e) => setFile(e.target.files?.[0] || null)}
+            onChange={(e) => {
+              setFile(e.target.files?.[0] || null);
+              setError("");
+              setSuccess("");
+            }}
           />
         </label>
 
@@ -207,6 +234,9 @@ export default function AddAnimal({ onSuccess }) {
             )}
           </div>
         )}
+
+        {error && <div className="form-error">{error}</div>}
+        {success && <div className="form-success">{success}</div>}
 
         <div className="form-row two-cols">
           <label>
@@ -271,8 +301,12 @@ export default function AddAnimal({ onSuccess }) {
           />
         </label>
 
-        <button className="primary-btn full" type="submit">
-          Сохранить животное
+        <button
+          className="primary-btn full"
+          type="submit"
+          disabled={loadingSubmit}
+        >
+          {loadingSubmit ? "Сохранение..." : "Сохранить животное"}
         </button>
       </form>
     </section>

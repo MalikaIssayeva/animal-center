@@ -621,3 +621,25 @@
 .animal-image img {
   transition: 0.2s ease;
 }
+
+.form-error {
+  margin-top: 4px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #fde8e8;
+  border: 1px solid #f5c2c7;
+  color: #b42318;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-success {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #e7f6ec;
+  border: 1px solid #b7e0c2;
+  color: #18794e;
+  font-size: 14px;
+  font-weight: 500;
+}

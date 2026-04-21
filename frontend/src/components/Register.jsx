@@ -6,14 +6,26 @@ export default function Register({ onRegisterSuccess }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [accountType, setAccountType] = useState("adopter");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password.length < 6) {
-      alert("Пароль должен содержать минимум 6 символов");
+    setError("");
+
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      setError("Заполните все поля");
       return;
     }
+
+    if (password.length < 6) {
+      setError("Пароль должен содержать минимум 6 символов");
+      return;
+    }
+
     try {
+      setLoading(true);
+
       await request("/register", {
         method: "POST",
         body: JSON.stringify({
@@ -24,14 +36,15 @@ export default function Register({ onRegisterSuccess }) {
         }),
       });
 
-      alert("Регистрация успешна! Теперь войдите в аккаунт.");
       setName("");
       setEmail("");
       setPassword("");
       setAccountType("adopter");
       onRegisterSuccess?.();
     } catch (err) {
-      alert("Ошибка регистрации");
+      setError(err.message || "Ошибка регистрации");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -74,8 +87,10 @@ export default function Register({ onRegisterSuccess }) {
             <option value="owner">Хозяин</option>
           </select>
 
-          <button className="primary-btn full" type="submit">
-            Зарегистрироваться
+          {error && <div className="form-error">{error}</div>}
+
+          <button className="primary-btn full" type="submit" disabled={loading}>
+            {loading ? "Регистрация..." : "Зарегистрироваться"}
           </button>
         </form>
       </div>

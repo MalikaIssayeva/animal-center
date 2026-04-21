@@ -55,8 +55,15 @@
     "password": "123456",
     "role": "user",
     "accountType": "owner",
-    "favorites": [
-      30
-    ]
+    "favorites": []
+  },
+  {
+    "id": 7,
+    "name": "Гоголь",
+    "email": "aaa@mail.com",
+    "password": "123456",
+    "role": "user",
+    "accountType": "adopter",
+    "favorites": []
   }
 ]

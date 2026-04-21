@@ -60,6 +60,7 @@ export default function Classify() {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!selectedFile) {
@@ -74,8 +75,11 @@ export default function Classify() {
   }, [selectedFile]);
 
   const runClassification = async () => {
+    setError("");
+    setResult(null);
+
     if (!selectedFile) {
-      alert("Сначала выбери изображение");
+      setError("Сначала выберите изображение.");
       return;
     }
 
@@ -93,7 +97,7 @@ export default function Classify() {
       setResult(data);
     } catch (error) {
       console.error(error);
-      alert("Не удалось выполнить классификацию");
+      setError(error.message || "Не удалось выполнить классификацию.");
     } finally {
       setLoading(false);
     }
@@ -127,6 +131,7 @@ export default function Classify() {
               const file = e.target.files?.[0] || null;
               setSelectedFile(file);
               setResult(null);
+              setError("");
             }}
           />
 
@@ -146,7 +151,10 @@ export default function Classify() {
             </div>
           )}
 
+          {error && <div className="form-error">{error}</div>}
+
           <button
+            type="button"
             className="primary-btn classify-btn"
             onClick={runClassification}
             disabled={loading}

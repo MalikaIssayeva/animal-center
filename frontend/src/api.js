@@ -13,9 +13,17 @@ export async function request(path, options = {}) {
         },
   });
 
-  if (!response.ok) {
-    throw new Error("Ошибка запроса к серверу");
+  let data = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
   }
 
-  return response.json();
+  if (!response.ok) {
+    throw new Error(data?.error || "Ошибка запроса к серверу");
+  }
+
+  return data;
 }

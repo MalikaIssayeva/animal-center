@@ -17,6 +17,10 @@ export default function Home({ user, onUserUpdate }) {
   const [onlyPending, setOnlyPending] = useState(false);
   const [onlyAvailable, setOnlyAvailable] = useState(false);
 
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loadingAction, setLoadingAction] = useState("");
+
   const sortAnimalsForAdmin = (list) => {
     const statusPriority = {
       pending: 0,
@@ -43,6 +47,7 @@ export default function Home({ user, onUserUpdate }) {
 
   const loadAnimals = async () => {
     try {
+      setError("");
       const query = new URLSearchParams();
 
       if (search) query.set("search", search);
@@ -53,6 +58,7 @@ export default function Home({ user, onUserUpdate }) {
       setAnimals(prepareAnimals(data));
     } catch (error) {
       console.error(error);
+      setError(error.message || "Не удалось загрузить животных.");
     }
   };
 
@@ -69,15 +75,26 @@ export default function Home({ user, onUserUpdate }) {
     if (!window.confirm(`Удалить животное "${name}"?`)) return;
 
     try {
+      setError("");
+      setSuccess("");
+      setLoadingAction(`delete-${id}`);
+
       await request(`/animals/${id}`, { method: "DELETE" });
       setAnimals((prev) => prev.filter((a) => a.id !== id));
-    } catch {
-      alert("Не удалось удалить животное");
+      setSuccess(`Животное "${name}" удалено.`);
+    } catch (err) {
+      setError(err.message || "Не удалось удалить животное.");
+    } finally {
+      setLoadingAction("");
     }
   };
 
   const handleStatusChange = async (id, status) => {
     try {
+      setError("");
+      setSuccess("");
+      setLoadingAction(`status-${id}`);
+
       const updated = await request(`/animals/${id}/status`, {
         method: "PATCH",
         body: JSON.stringify({ status }),
@@ -87,15 +104,26 @@ export default function Home({ user, onUserUpdate }) {
         const updatedList = prev.map((a) => (a.id === id ? updated : a));
         return prepareAnimals(updatedList);
       });
-    } catch {
-      alert("Ошибка изменения статуса");
+
+      setSuccess("Статус животного обновлён.");
+    } catch (err) {
+      setError(err.message || "Ошибка изменения статуса.");
+    } finally {
+      setLoadingAction("");
     }
   };
 
   const toggleFavorite = async (id) => {
-    if (!user) return alert("Сначала войдите");
+    if (!user) {
+      setError("Сначала войдите в аккаунт.");
+      return;
+    }
 
     try {
+      setError("");
+      setSuccess("");
+      setLoadingAction(`favorite-${id}`);
+
       const isFav = user.favorites?.includes(id);
 
       const updatedUser = await request(`/users/${user.id}/favorites/${id}`, {
@@ -104,15 +132,30 @@ export default function Home({ user, onUserUpdate }) {
 
       localStorage.setItem("user", JSON.stringify(updatedUser));
       onUserUpdate?.(updatedUser);
-    } catch {
-      alert("Ошибка избранного");
+
+      setSuccess(
+        isFav
+          ? "Животное удалено из избранного."
+          : "Животное добавлено в избранное.",
+      );
+    } catch (err) {
+      setError(err.message || "Ошибка избранного.");
+    } finally {
+      setLoadingAction("");
     }
   };
 
   const handleAdoptionRequest = async (id) => {
-    if (!user) return alert("Сначала войдите");
+    if (!user) {
+      setError("Сначала войдите в аккаунт.");
+      return;
+    }
 
     try {
+      setError("");
+      setSuccess("");
+      setLoadingAction(`adopt-${id}`);
+
       const updated = await request(`/animals/${id}/adopt-request`, {
         method: "POST",
         body: JSON.stringify({ userId: user.id }),
@@ -122,13 +165,21 @@ export default function Home({ user, onUserUpdate }) {
         const updatedList = prev.map((a) => (a.id === id ? updated : a));
         return prepareAnimals(updatedList);
       });
-    } catch {
-      alert("Ошибка заявки");
+
+      setSuccess("Заявка на усыновление отправлена.");
+    } catch (err) {
+      setError(err.message || "Ошибка заявки.");
+    } finally {
+      setLoadingAction("");
     }
   };
 
   const handleApprove = async (id) => {
     try {
+      setError("");
+      setSuccess("");
+      setLoadingAction(`approve-${id}`);
+
       const updated = await request(`/animals/${id}/status`, {
         method: "PATCH",
         body: JSON.stringify({ status: "adopted" }),
@@ -138,13 +189,21 @@ export default function Home({ user, onUserUpdate }) {
         const updatedList = prev.map((a) => (a.id === id ? updated : a));
         return prepareAnimals(updatedList);
       });
-    } catch {
-      alert("Не удалось подтвердить заявку");
+
+      setSuccess("Заявка подтверждена.");
+    } catch (err) {
+      setError(err.message || "Не удалось подтвердить заявку.");
+    } finally {
+      setLoadingAction("");
     }
   };
 
   const handleReject = async (id) => {
     try {
+      setError("");
+      setSuccess("");
+      setLoadingAction(`reject-${id}`);
+
       const updated = await request(`/animals/${id}/status`, {
         method: "PATCH",
         body: JSON.stringify({ status: "available" }),
@@ -154,8 +213,12 @@ export default function Home({ user, onUserUpdate }) {
         const updatedList = prev.map((a) => (a.id === id ? updated : a));
         return prepareAnimals(updatedList);
       });
-    } catch {
-      alert("Не удалось отклонить заявку");
+
+      setSuccess("Заявка отклонена.");
+    } catch (err) {
+      setError(err.message || "Не удалось отклонить заявку.");
+    } finally {
+      setLoadingAction("");
     }
   };
 
@@ -226,12 +289,19 @@ export default function Home({ user, onUserUpdate }) {
 
       <form className="filters" onSubmit={handleSearchSubmit}>
         <input
+          id="search"
+          name="search"
           placeholder="Поиск..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        <select value={type} onChange={(e) => setType(e.target.value)}>
+        <select
+          id="type-filter"
+          name="typeFilter"
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+        >
           <option>Все</option>
           <option>Собака</option>
           <option>Кошка</option>
@@ -239,7 +309,12 @@ export default function Home({ user, onUserUpdate }) {
           <option>Хомяк</option>
         </select>
 
-        <select value={sort} onChange={(e) => setSort(e.target.value)}>
+        <select
+          id="sort-filter"
+          name="sortFilter"
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+        >
           <option value="newest">Сначала новые</option>
           <option value="name_asc">Имя А-Я</option>
           <option value="name_desc">Имя Я-А</option>
@@ -259,6 +334,9 @@ export default function Home({ user, onUserUpdate }) {
           Расширенный поиск
         </button>
       </form>
+
+      {error && <div className="form-error">{error}</div>}
+      {success && <div className="form-success">{success}</div>}
 
       <h3>Животные</h3>
 
@@ -338,8 +416,13 @@ export default function Home({ user, onUserUpdate }) {
                         type="button"
                         className={isFav ? "primary-btn" : "secondary-btn"}
                         onClick={() => toggleFavorite(a.id)}
+                        disabled={loadingAction === `favorite-${a.id}`}
                       >
-                        {isFav ? "Убрать" : "В избранное"}
+                        {loadingAction === `favorite-${a.id}`
+                          ? "Подождите..."
+                          : isFav
+                            ? "Убрать"
+                            : "В избранное"}
                       </button>
                     )}
 
@@ -350,8 +433,11 @@ export default function Home({ user, onUserUpdate }) {
                           type="button"
                           className="primary-btn"
                           onClick={() => handleAdoptionRequest(a.id)}
+                          disabled={loadingAction === `adopt-${a.id}`}
                         >
-                          Подать заявку
+                          {loadingAction === `adopt-${a.id}`
+                            ? "Отправка..."
+                            : "Подать заявку"}
                         </button>
                       )}
 
@@ -363,16 +449,22 @@ export default function Home({ user, onUserUpdate }) {
                               type="button"
                               className="primary-btn"
                               onClick={() => handleApprove(a.id)}
+                              disabled={loadingAction === `approve-${a.id}`}
                             >
-                              Подтвердить
+                              {loadingAction === `approve-${a.id}`
+                                ? "Подтверждение..."
+                                : "Подтвердить"}
                             </button>
 
                             <button
                               type="button"
                               className="secondary-btn"
                               onClick={() => handleReject(a.id)}
+                              disabled={loadingAction === `reject-${a.id}`}
                             >
-                              Отклонить
+                              {loadingAction === `reject-${a.id}`
+                                ? "Отклонение..."
+                                : "Отклонить"}
                             </button>
                           </>
                         ) : (
@@ -381,6 +473,7 @@ export default function Home({ user, onUserUpdate }) {
                             onChange={(e) =>
                               handleStatusChange(a.id, e.target.value)
                             }
+                            disabled={loadingAction === `status-${a.id}`}
                           >
                             <option value="available">Доступен</option>
                             <option value="adopted">Усыновлён</option>
@@ -392,8 +485,11 @@ export default function Home({ user, onUserUpdate }) {
                           type="button"
                           className="secondary-btn"
                           onClick={() => handleDelete(a.id, a.name)}
+                          disabled={loadingAction === `delete-${a.id}`}
                         >
-                          Удалить
+                          {loadingAction === `delete-${a.id}`
+                            ? "Удаление..."
+                            : "Удалить"}
                         </button>
                       </>
                     )}
@@ -428,6 +524,8 @@ export default function Home({ user, onUserUpdate }) {
               <label>
                 Статус
                 <select
+                  id="status-filter"
+                  name="statusFilter"
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                 >
@@ -442,6 +540,8 @@ export default function Home({ user, onUserUpdate }) {
               <label>
                 Состояние здоровья
                 <select
+                  id="health-filter"
+                  name="healthFilter"
                   value={healthFilter}
                   onChange={(e) => setHealthFilter(e.target.value)}
                 >
@@ -454,6 +554,8 @@ export default function Home({ user, onUserUpdate }) {
 
               <label className="checkbox-row">
                 <input
+                  id="only-pending"
+                  name="onlyPending"
                   type="checkbox"
                   checked={onlyPending}
                   onChange={(e) => setOnlyPending(e.target.checked)}
@@ -463,6 +565,8 @@ export default function Home({ user, onUserUpdate }) {
 
               <label className="checkbox-row">
                 <input
+                  id="only-available"
+                  name="onlyAvailable"
                   type="checkbox"
                   checked={onlyAvailable}
                   onChange={(e) => setOnlyAvailable(e.target.checked)}

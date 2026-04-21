@@ -592,3 +592,32 @@
 .checkbox-row input {
   width: auto;
 }
+
+.profile-avatar img {
+  width: 40 px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.animal-image img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+}
+
+.animal-image {
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f4f7ff;
+  border-radius: 16px;
+}
+
+.animal-card:hover .animal-image img {
+  transform: scale(1.05);
+}
+
+.animal-image img {
+  transition: 0.2s ease;
+}

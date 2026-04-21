@@ -1,5 +1,22 @@
 import { useEffect, useState } from "react";
 import { request } from "../api";
+import dogIcon from "../assets/dog.svg";
+import catIcon from "../assets/cat.svg";
+import birdIcon from "../assets/bird.svg";
+import hamsterIcon from "../assets/hamster.svg";
+
+function getAnimalIcon(type) {
+  if (!type) return dogIcon;
+
+  const t = type.toLowerCase();
+
+  if (t.includes("собак")) return dogIcon;
+  if (t.includes("кошк")) return catIcon;
+  if (t.includes("птиц")) return birdIcon;
+  if (t.includes("хомяк")) return hamsterIcon;
+
+  return dogIcon;
+}
 
 export default function MyAnimals({ user }) {
   const [animals, setAnimals] = useState([]);
@@ -51,7 +68,9 @@ export default function MyAnimals({ user }) {
       <div className="animal-grid">
         {animals.map((a) => (
           <article className="animal-card" key={a.id}>
-            <div className="animal-image">{a.image || "🐾"}</div>
+            <div className="animal-image">
+              <img src={getAnimalIcon(a.type)} alt={a.type} />
+            </div>
 
             <div className="animal-content">
               <h4>{a.name}</h4>

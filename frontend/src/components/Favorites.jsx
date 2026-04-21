@@ -1,5 +1,22 @@
 import { useEffect, useState } from "react";
 import { request } from "../api";
+import dogIcon from "../assets/dog.svg";
+import catIcon from "../assets/cat.svg";
+import birdIcon from "../assets/bird.svg";
+import hamsterIcon from "../assets/hamster.svg";
+
+function getAnimalIcon(type) {
+  if (!type) return dogIcon;
+
+  const t = type.toLowerCase();
+
+  if (t.includes("собак")) return dogIcon;
+  if (t.includes("кошк")) return catIcon;
+  if (t.includes("птиц")) return birdIcon;
+  if (t.includes("хомяк")) return hamsterIcon;
+
+  return dogIcon;
+}
 
 export default function Favorites({ user, onUserUpdate }) {
   const [animals, setAnimals] = useState([]);
@@ -55,7 +72,9 @@ export default function Favorites({ user, onUserUpdate }) {
         {animals.length ? (
           animals.map((a) => (
             <article className="animal-card" key={a.id}>
-              <div className="animal-image">{a.image || "🐾"}</div>
+              <div className="animal-image">
+                <img src={getAnimalIcon(a.type)} alt={a.type} />
+              </div>
 
               <div className="animal-content">
                 <h4>{a.name}</h4>
@@ -68,7 +87,6 @@ export default function Favorites({ user, onUserUpdate }) {
                   <span className="tag">{a.type}</span>
                 </div>
 
-                {/* 👉 статус животного */}
                 <div className="status-row">
                   {a.status === "available" && (
                     <span className="status-pill status-available">
@@ -95,12 +113,10 @@ export default function Favorites({ user, onUserUpdate }) {
                   )}
                 </div>
 
-                {/* описание */}
                 {a.description && (
                   <p className="animal-desc">{a.description}</p>
                 )}
 
-                {/* статус заявки пользователя */}
                 {a.adoptionRequestedBy === user?.id && (
                   <>
                     {a.adoptionDecision === "pending" && (
@@ -137,7 +153,7 @@ export default function Favorites({ user, onUserUpdate }) {
           ))
         ) : (
           <div className="card empty-state">
-            У вас пока нет избранных животных 🐾
+            У вас пока нет избранных животных.
           </div>
         )}
       </div>

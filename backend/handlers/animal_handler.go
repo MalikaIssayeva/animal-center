@@ -107,21 +107,6 @@ func CreateAnimal(c *gin.Context) {
 		return
 	}
 
-	if input.Image == "" {
-		switch strings.ToLower(input.Type) {
-		case "кошка":
-			input.Image = "🐱"
-		case "собака":
-			input.Image = "🐶"
-		case "птица":
-			input.Image = "🐦"
-		case "хомяк":
-			input.Image = "🐹"
-		default:
-			input.Image = "🐾"
-		}
-	}
-
 	if input.Status == "" {
 		if utils.ContainsFold(input.Health, "леч") {
 			input.Status = "treatment"

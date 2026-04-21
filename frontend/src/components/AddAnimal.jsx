@@ -96,7 +96,6 @@ export default function AddAnimal({ onSuccess }) {
         confidence: data?.confidence ?? 0,
       });
 
-      // 🔥 гибрид: тип подставляем сразу
       if (type !== "Не удалось уверенно определить тип") {
         setForm((prev) => ({
           ...prev,

@@ -1,5 +1,6 @@
 import MyAnimals from "./MyAnimals";
 import MyRequests from "./MyRequests";
+import avatar from "../assets/avatar.svg";
 
 export default function Profile({ user }) {
   if (!user) {
@@ -20,7 +21,9 @@ export default function Profile({ user }) {
       <div className="profile-grid">
         <div className="card profile-main">
           <div className="profile-header">
-            <div className="profile-avatar">👤</div>
+            <div className="profile-avatar">
+              <img src={avatar} alt="avatar" />
+            </div>
             <div>
               <h3>{user.name}</h3>
               <p className="muted">{user.email}</p>
@@ -47,7 +50,7 @@ export default function Profile({ user }) {
           </div>
 
           <div className="profile-hint">
-            <p>💡 Сохраняйте животных, чтобы быстро вернуться к ним позже.</p>
+            <p>Сохраняйте животных, чтобы быстро вернуться к ним позже.</p>
           </div>
         </div>
       </div>

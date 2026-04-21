@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { request } from "../api";
+import dogIcon from "../assets/dog.svg";
+import catIcon from "../assets/cat.svg";
+import birdIcon from "../assets/bird.svg";
+import hamsterIcon from "../assets/hamster.svg";
 
 export default function Home({ user, onUserUpdate }) {
   const [animals, setAnimals] = useState([]);
@@ -200,10 +204,23 @@ export default function Home({ user, onUserUpdate }) {
     return "На лечении";
   };
 
+  const getAnimalIcon = (type) => {
+    if (!type) return dogIcon;
+
+    const t = type.toLowerCase();
+
+    if (t.includes("собак")) return dogIcon;
+    if (t.includes("кошк")) return catIcon;
+    if (t.includes("птиц")) return birdIcon;
+    if (t.includes("хомяк")) return hamsterIcon;
+
+    return dogIcon;
+  };
+
   return (
     <section>
       <div className="hero">
-        <h2>Найди друга 🐾</h2>
+        <h2>Найди друга</h2>
         <p>Все животные ждут своего хозяина</p>
       </div>
 
@@ -252,7 +269,13 @@ export default function Home({ user, onUserUpdate }) {
 
             return (
               <article className="animal-card" key={a.id}>
-                <div className="animal-image">{a.image || "🐾"}</div>
+                <div className="animal-image">
+                  {a.image ? (
+                    <img src={a.image} alt={a.name} />
+                  ) : (
+                    <img src={getAnimalIcon(a.type)} alt={a.type} />
+                  )}
+                </div>
 
                 <div className="animal-content">
                   <h4>{a.name}</h4>

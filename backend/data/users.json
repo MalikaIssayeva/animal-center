@@ -55,6 +55,8 @@
     "password": "123456",
     "role": "user",
     "accountType": "owner",
-    "favorites": []
+    "favorites": [
+      30
+    ]
   }
 ]

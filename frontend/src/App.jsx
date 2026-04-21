@@ -7,6 +7,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Favorites from "./components/Favorites";
 import Profile from "./components/Profile";
+import logo from "./assets/logo.svg";
 
 export default function App() {
   const [page, setPage] = useState("home");
@@ -42,7 +43,13 @@ export default function App() {
     <div className="app-shell">
       <header className="header">
         <div className="brand">
-          <div className="brand-logo">🐾</div>
+          <div className="brand-logo">
+            <img
+              src={logo}
+              alt="Animal Center logo"
+              className="brand-logo-img"
+            />
+          </div>
           <div>
             <h1>Animal Center</h1>
             <p>Сервис помощи и усыновления животных</p>

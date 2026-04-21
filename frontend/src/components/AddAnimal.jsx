@@ -1,6 +1,53 @@
 import { useState } from "react";
 import { request } from "../api";
 
+function translateLabel(label) {
+  if (!label) return "Не определено";
+
+  const map = {
+    chihuahua: "Чихуахуа",
+    toy_terrier: "Той-терьер",
+    miniature_pinscher: "Карликовый пинчер",
+    doberman: "Доберман",
+    golden_retriever: "Золотистый ретривер",
+    labrador_retriever: "Лабрадор-ретривер",
+    german_shepherd: "Немецкая овчарка",
+    siberian_husky: "Сибирский хаски",
+    beagle: "Бигль",
+    french_bulldog: "Французский бульдог",
+    english_bulldog: "Английский бульдог",
+    pug: "Мопс",
+    pomeranian: "Померанский шпиц",
+    samoyed: "Самоед",
+    boxer: "Боксер",
+    dalmatian: "Далматин",
+    tabby: "Полосатая кошка",
+    tiger_cat: "Тигровая кошка",
+    persian_cat: "Персидская кошка",
+    siamese_cat: "Сиамская кошка",
+    egyptian_cat: "Египетская кошка",
+    lynx: "Рысь",
+    hamster: "Хомяк",
+    guinea_pig: "Морская свинка",
+    mouse: "Мышь",
+    rat: "Крыса",
+    cockatoo: "Какаду",
+    macaw: "Ара",
+    lorikeet: "Лорикет",
+    parrot: "Попугай",
+    canary: "Канарейка",
+  };
+
+  const normalized = label.toLowerCase().replaceAll(" ", "_").trim();
+
+  if (map[normalized]) return map[normalized];
+
+  return label
+    .replaceAll("_", " ")
+    .trim()
+    .replace(/\b\w/g, (ch) => ch.toUpperCase());
+}
+
 export default function AddAnimal({ onSuccess }) {
   const [form, setForm] = useState({
     name: "",
@@ -12,6 +59,10 @@ export default function AddAnimal({ onSuccess }) {
     description: "",
   });
 
+  const [file, setFile] = useState(null);
+  const [prediction, setPrediction] = useState(null);
+  const [loadingML, setLoadingML] = useState(false);
+
   const handleChange = (e) => {
     setForm((prev) => ({
       ...prev,
@@ -19,17 +70,56 @@ export default function AddAnimal({ onSuccess }) {
     }));
   };
 
+  const handleClassify = async () => {
+    if (!file) {
+      alert("Сначала выбери фото");
+      return;
+    }
+
+    try {
+      setLoadingML(true);
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const data = await request("/classify", {
+        method: "POST",
+        body: formData,
+      });
+
+      const label = data?.predictedBreed || "Не определено";
+      const type = data?.predictedType || "Не удалось уверенно определить тип";
+
+      setPrediction({
+        raw: label,
+        type,
+        confidence: data?.confidence ?? 0,
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Ошибка ML");
+    } finally {
+      setLoadingML(false);
+    }
+  };
+
+  const applyPrediction = () => {
+    if (!prediction) return;
+
+    setForm((prev) => ({
+      ...prev,
+      type: prediction.type,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
-
       const payload = {
         ...form,
         tags: [],
         status: form.health === "На лечении" ? "treatment" : "available",
-        ownerId: user?.id || 0,
       };
 
       await request("/animals", {
@@ -47,6 +137,9 @@ export default function AddAnimal({ onSuccess }) {
         description: "",
       });
 
+      setFile(null);
+      setPrediction(null);
+
       alert("Животное добавлено");
       onSuccess?.();
     } catch (error) {
@@ -60,6 +153,48 @@ export default function AddAnimal({ onSuccess }) {
       <h2>Добавить животное</h2>
 
       <form className="card form-card" onSubmit={handleSubmit}>
+        <label>
+          Фото животного
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+          />
+        </label>
+
+        <button
+          type="button"
+          className="secondary-btn"
+          onClick={handleClassify}
+          disabled={loadingML}
+        >
+          {loadingML ? "Определение..." : "Определить по фото"}
+        </button>
+
+        {prediction && (
+          <div className="ml-result">
+            <p>
+              <strong>Тип:</strong> {prediction.type}
+            </p>
+            <p>
+              <strong>Метка модели:</strong> {translateLabel(prediction.raw)}
+            </p>
+            <p>
+              <strong>Уверенность:</strong> {prediction.confidence}%
+            </p>
+
+            {prediction.type !== "Не удалось уверенно определить тип" && (
+              <button
+                type="button"
+                className="primary-btn"
+                onClick={applyPrediction}
+              >
+                Использовать результат
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="form-row two-cols">
           <label>
             Кличка
@@ -68,7 +203,6 @@ export default function AddAnimal({ onSuccess }) {
               required
               value={form.name}
               onChange={handleChange}
-              placeholder="Барсик"
             />
           </label>
 
@@ -86,24 +220,12 @@ export default function AddAnimal({ onSuccess }) {
         <div className="form-row two-cols">
           <label>
             Порода
-            <input
-              name="breed"
-              required
-              value={form.breed}
-              onChange={handleChange}
-              placeholder="Лабрадор"
-            />
+            <input name="breed" value={form.breed} onChange={handleChange} />
           </label>
 
           <label>
             Возраст
-            <input
-              name="age"
-              required
-              value={form.age}
-              onChange={handleChange}
-              placeholder="2 года"
-            />
+            <input name="age" value={form.age} onChange={handleChange} />
           </label>
         </div>
 
@@ -133,7 +255,6 @@ export default function AddAnimal({ onSuccess }) {
             rows="4"
             value={form.description}
             onChange={handleChange}
-            placeholder="Ласковый, игривый, ищет любящий дом..."
           />
         </label>
 

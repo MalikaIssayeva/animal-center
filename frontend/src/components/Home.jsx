@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { request } from "../api";
 
 export default function Home({ user, onUserUpdate }) {
@@ -6,6 +6,36 @@ export default function Home({ user, onUserUpdate }) {
   const [search, setSearch] = useState("");
   const [type, setType] = useState("Все");
   const [sort, setSort] = useState("newest");
+
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("Все");
+  const [healthFilter, setHealthFilter] = useState("Все");
+  const [onlyPending, setOnlyPending] = useState(false);
+  const [onlyAvailable, setOnlyAvailable] = useState(false);
+
+  const sortAnimalsForAdmin = (list) => {
+    const statusPriority = {
+      pending: 0,
+      available: 1,
+      treatment: 2,
+      adopted: 3,
+    };
+
+    return [...list].sort((a, b) => {
+      const aPriority = statusPriority[a.status] ?? 99;
+      const bPriority = statusPriority[b.status] ?? 99;
+
+      if (aPriority !== bPriority) {
+        return aPriority - bPriority;
+      }
+
+      return b.id - a.id;
+    });
+  };
+
+  const prepareAnimals = (list) => {
+    return user?.role === "admin" ? sortAnimalsForAdmin(list) : list;
+  };
 
   const loadAnimals = async () => {
     try {
@@ -16,7 +46,7 @@ export default function Home({ user, onUserUpdate }) {
       if (sort && sort !== "newest") query.set("sort", sort);
 
       const data = await request(`/animals?${query.toString()}`);
-      setAnimals(data);
+      setAnimals(prepareAnimals(data));
     } catch (error) {
       console.error(error);
     }
@@ -24,7 +54,7 @@ export default function Home({ user, onUserUpdate }) {
 
   useEffect(() => {
     loadAnimals();
-  }, []);
+  }, [user]);
 
   const handleSearchSubmit = async (e) => {
     e.preventDefault();
@@ -49,7 +79,10 @@ export default function Home({ user, onUserUpdate }) {
         body: JSON.stringify({ status }),
       });
 
-      setAnimals((prev) => prev.map((a) => (a.id === id ? updated : a)));
+      setAnimals((prev) => {
+        const updatedList = prev.map((a) => (a.id === id ? updated : a));
+        return prepareAnimals(updatedList);
+      });
     } catch {
       alert("Ошибка изменения статуса");
     }
@@ -81,29 +114,77 @@ export default function Home({ user, onUserUpdate }) {
         body: JSON.stringify({ userId: user.id }),
       });
 
-      setAnimals((prev) => prev.map((a) => (a.id === id ? updated : a)));
+      setAnimals((prev) => {
+        const updatedList = prev.map((a) => (a.id === id ? updated : a));
+        return prepareAnimals(updatedList);
+      });
     } catch {
       alert("Ошибка заявки");
     }
   };
 
   const handleApprove = async (id) => {
-    const updated = await request(`/animals/${id}/status`, {
-      method: "PATCH",
-      body: JSON.stringify({ status: "adopted" }),
-    });
+    try {
+      const updated = await request(`/animals/${id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "adopted" }),
+      });
 
-    setAnimals((prev) => prev.map((a) => (a.id === id ? updated : a)));
+      setAnimals((prev) => {
+        const updatedList = prev.map((a) => (a.id === id ? updated : a));
+        return prepareAnimals(updatedList);
+      });
+    } catch {
+      alert("Не удалось подтвердить заявку");
+    }
   };
 
   const handleReject = async (id) => {
-    const updated = await request(`/animals/${id}/status`, {
-      method: "PATCH",
-      body: JSON.stringify({ status: "available" }),
-    });
+    try {
+      const updated = await request(`/animals/${id}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "available" }),
+      });
 
-    setAnimals((prev) => prev.map((a) => (a.id === id ? updated : a)));
+      setAnimals((prev) => {
+        const updatedList = prev.map((a) => (a.id === id ? updated : a));
+        return prepareAnimals(updatedList);
+      });
+    } catch {
+      alert("Не удалось отклонить заявку");
+    }
   };
+
+  const resetAdvancedFilters = () => {
+    setStatusFilter("Все");
+    setHealthFilter("Все");
+    setOnlyPending(false);
+    setOnlyAvailable(false);
+  };
+
+  const filteredAnimals = useMemo(() => {
+    let list = [...animals];
+
+    if (statusFilter !== "Все") {
+      list = list.filter((a) => a.status === statusFilter);
+    }
+
+    if (healthFilter !== "Все") {
+      list = list.filter((a) =>
+        (a.health || "").toLowerCase().includes(healthFilter.toLowerCase()),
+      );
+    }
+
+    if (onlyPending) {
+      list = list.filter((a) => a.status === "pending");
+    }
+
+    if (onlyAvailable) {
+      list = list.filter((a) => a.status === "available");
+    }
+
+    return prepareAnimals(list);
+  }, [animals, statusFilter, healthFilter, onlyPending, onlyAvailable, user]);
 
   const getStatusClass = (status) => {
     if (status === "available") return "status-pill status-available";
@@ -149,125 +230,244 @@ export default function Home({ user, onUserUpdate }) {
           <option value="age_desc">Старшие</option>
         </select>
 
-        <button className="secondary-btn">Найти</button>
+        <button className="secondary-btn" type="submit">
+          Найти
+        </button>
+
+        <button
+          type="button"
+          className="primary-btn"
+          onClick={() => setIsFilterModalOpen(true)}
+        >
+          Расширенный поиск
+        </button>
       </form>
 
       <h3>Животные</h3>
 
       <div className="animal-grid">
-        {animals.map((a) => {
-          const isFav = user?.favorites?.includes(a.id);
+        {filteredAnimals.length ? (
+          filteredAnimals.map((a) => {
+            const isFav = user?.favorites?.includes(a.id);
 
-          return (
-            <article className="animal-card" key={a.id}>
-              <div className="animal-image">{a.image || "🐾"}</div>
+            return (
+              <article className="animal-card" key={a.id}>
+                <div className="animal-image">{a.image || "🐾"}</div>
 
-              <div className="animal-content">
-                <h4>{a.name}</h4>
+                <div className="animal-content">
+                  <h4>{a.name}</h4>
 
-                <p className="animal-meta">
-                  {a.breed}, {a.age}
-                </p>
+                  <p className="animal-meta">
+                    {a.breed}, {a.age}
+                  </p>
 
-                <div className="badge-row">
-                  <span className="badge">{a.health}</span>
-                  <span className="tag">{a.type}</span>
-                  <span className={getStatusClass(a.status)}>
-                    {getStatusLabel(a.status)}
-                  </span>
-                </div>
+                  <div className="badge-row">
+                    <span className="badge">{a.health}</span>
+                    <span className="tag">{a.type}</span>
+                    <span className={getStatusClass(a.status)}>
+                      {getStatusLabel(a.status)}
+                    </span>
+                  </div>
 
-                {a.adoptionRequestedBy === user?.id && (
-                  <>
-                    {a.adoptionDecision === "pending" && (
-                      <div className="notice-box notice-pending">
-                        Заявка отправлена
-                      </div>
-                    )}
-
-                    {a.adoptionDecision === "approved" && (
-                      <div className="notice-box notice-approved">
-                        Усыновление подтверждено
-                      </div>
-                    )}
-
-                    {a.adoptionDecision === "rejected" && (
-                      <div className="notice-box notice-rejected">
-                        Заявка отклонена
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {a.description && (
-                  <p className="animal-desc">{a.description}</p>
-                )}
-
-                <div className="card-actions">
-                  {user && user.role !== "admin" && (
-                    <button
-                      className={isFav ? "primary-btn" : "secondary-btn"}
-                      onClick={() => toggleFavorite(a.id)}
-                    >
-                      {isFav ? "Убрать" : "В избранное"}
-                    </button>
+                  {user?.role === "admin" && a.status === "pending" && (
+                    <div className="notice-box notice-pending">
+                      Требует решения администратора
+                    </div>
                   )}
 
-                  {user?.accountType === "adopter" &&
-                    a.status === "available" &&
-                    a.ownerId !== user.id && (
-                      <button
-                        className="primary-btn"
-                        onClick={() => handleAdoptionRequest(a.id)}
-                      >
-                        Подать заявку
-                      </button>
+                  {(user?.role === "admin" || a.ownerId === user?.id) &&
+                    a.status === "pending" &&
+                    a.adoptionRequestedBy > 0 && (
+                      <div className="notice-box notice-pending">
+                        Заявка от пользователя #{a.adoptionRequestedBy}
+                      </div>
                     )}
 
-                  {user?.role === "admin" && (
+                  {a.adoptionRequestedBy === user?.id && (
                     <>
-                      {a.status === "pending" ? (
-                        <>
-                          <button
-                            className="primary-btn"
-                            onClick={() => handleApprove(a.id)}
-                          >
-                            Подтвердить
-                          </button>
-                          <button
-                            className="secondary-btn"
-                            onClick={() => handleReject(a.id)}
-                          >
-                            Отклонить
-                          </button>
-                        </>
-                      ) : (
-                        <select
-                          value={a.status}
-                          onChange={(e) =>
-                            handleStatusChange(a.id, e.target.value)
-                          }
-                        >
-                          <option value="available">Доступен</option>
-                          <option value="adopted">Усыновлён</option>
-                          <option value="treatment">На лечении</option>
-                        </select>
+                      {a.adoptionDecision === "pending" && (
+                        <div className="notice-box notice-pending">
+                          Заявка отправлена
+                        </div>
                       )}
 
-                      <button
-                        className="secondary-btn"
-                        onClick={() => handleDelete(a.id, a.name)}
-                      >
-                        Удалить
-                      </button>
+                      {a.adoptionDecision === "approved" && (
+                        <div className="notice-box notice-approved">
+                          Усыновление подтверждено
+                        </div>
+                      )}
+
+                      {a.adoptionDecision === "rejected" && (
+                        <div className="notice-box notice-rejected">
+                          Заявка отклонена
+                        </div>
+                      )}
                     </>
                   )}
+
+                  {a.description && (
+                    <p className="animal-desc">{a.description}</p>
+                  )}
+
+                  <div className="card-actions">
+                    {user && user.role !== "admin" && (
+                      <button
+                        type="button"
+                        className={isFav ? "primary-btn" : "secondary-btn"}
+                        onClick={() => toggleFavorite(a.id)}
+                      >
+                        {isFav ? "Убрать" : "В избранное"}
+                      </button>
+                    )}
+
+                    {user?.accountType === "adopter" &&
+                      a.status === "available" &&
+                      a.ownerId !== user.id && (
+                        <button
+                          type="button"
+                          className="primary-btn"
+                          onClick={() => handleAdoptionRequest(a.id)}
+                        >
+                          Подать заявку
+                        </button>
+                      )}
+
+                    {user?.role === "admin" && (
+                      <>
+                        {a.status === "pending" ? (
+                          <>
+                            <button
+                              type="button"
+                              className="primary-btn"
+                              onClick={() => handleApprove(a.id)}
+                            >
+                              Подтвердить
+                            </button>
+
+                            <button
+                              type="button"
+                              className="secondary-btn"
+                              onClick={() => handleReject(a.id)}
+                            >
+                              Отклонить
+                            </button>
+                          </>
+                        ) : (
+                          <select
+                            value={a.status}
+                            onChange={(e) =>
+                              handleStatusChange(a.id, e.target.value)
+                            }
+                          >
+                            <option value="available">Доступен</option>
+                            <option value="adopted">Усыновлён</option>
+                            <option value="treatment">На лечении</option>
+                          </select>
+                        )}
+
+                        <button
+                          type="button"
+                          className="secondary-btn"
+                          onClick={() => handleDelete(a.id, a.name)}
+                        >
+                          Удалить
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </article>
-          );
-        })}
+              </article>
+            );
+          })
+        ) : (
+          <div className="card empty-state">Ничего не найдено.</div>
+        )}
       </div>
+
+      {isFilterModalOpen && (
+        <div
+          className="modal-overlay"
+          onClick={() => setIsFilterModalOpen(false)}
+        >
+          <div className="filter-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="filter-modal-header">
+              <h3>Расширенный поиск</h3>
+              <button
+                type="button"
+                className="secondary-btn"
+                onClick={() => setIsFilterModalOpen(false)}
+              >
+                Закрыть
+              </button>
+            </div>
+
+            <div className="filter-modal-body">
+              <label>
+                Статус
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                  <option value="Все">Все</option>
+                  <option value="available">Доступен</option>
+                  <option value="pending">Есть заявка</option>
+                  <option value="adopted">Усыновлён</option>
+                  <option value="treatment">На лечении</option>
+                </select>
+              </label>
+
+              <label>
+                Состояние здоровья
+                <select
+                  value={healthFilter}
+                  onChange={(e) => setHealthFilter(e.target.value)}
+                >
+                  <option value="Все">Все</option>
+                  <option value="Здоров">Здоров</option>
+                  <option value="леч">На лечении</option>
+                  <option value="Стерилизована">Стерилизована</option>
+                </select>
+              </label>
+
+              <label className="checkbox-row">
+                <input
+                  type="checkbox"
+                  checked={onlyPending}
+                  onChange={(e) => setOnlyPending(e.target.checked)}
+                />
+                <span>Только животные с заявками</span>
+              </label>
+
+              <label className="checkbox-row">
+                <input
+                  type="checkbox"
+                  checked={onlyAvailable}
+                  onChange={(e) => setOnlyAvailable(e.target.checked)}
+                />
+                <span>Только доступные для усыновления</span>
+              </label>
+            </div>
+
+            <div className="filter-modal-actions">
+              <button
+                type="button"
+                className="secondary-btn"
+                onClick={resetAdvancedFilters}
+              >
+                Сбросить
+              </button>
+
+              <button
+                type="button"
+                className="primary-btn"
+                onClick={() => setIsFilterModalOpen(false)}
+              >
+                Применить
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

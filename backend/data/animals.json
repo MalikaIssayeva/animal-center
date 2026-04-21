@@ -371,8 +371,8 @@
     "image": "🐦",
     "status": "available",
     "ownerId": 0,
-    "adoptionRequestedBy": 0,
-    "adoptionDecision": ""
+    "adoptionRequestedBy": 5,
+    "adoptionDecision": "rejected"
   },
   {
     "id": 26,
@@ -414,10 +414,10 @@
     "health": "Здоров",
     "description": "Белый и пушистый.",
     "image": "🐹",
-    "status": "available",
+    "status": "adopted",
     "ownerId": 0,
-    "adoptionRequestedBy": 0,
-    "adoptionDecision": ""
+    "adoptionRequestedBy": 5,
+    "adoptionDecision": "approved"
   },
   {
     "id": 30,
@@ -426,10 +426,10 @@
     "breed": "Сирийский",
     "age": "6 месяцев",
     "gender": "Самец",
-    "health": "Здоров",
+    "health": "На лечении",
     "description": "Активный и веселый.",
     "image": "🐹",
-    "status": "adopted",
+    "status": "treatment",
     "ownerId": 0,
     "adoptionRequestedBy": 5,
     "adoptionDecision": "approved"
@@ -446,7 +446,7 @@
     "image": "🐶",
     "status": "available",
     "ownerId": 6,
-    "adoptionRequestedBy": 0,
-    "adoptionDecision": ""
+    "adoptionRequestedBy": 5,
+    "adoptionDecision": "rejected"
   }
 ]

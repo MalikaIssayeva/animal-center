@@ -61,7 +61,7 @@ export default function App() {
           )}
 
           <button className="secondary-btn" onClick={() => setPage("classify")}>
-            Классификация
+            Модель классификации
           </button>
 
           <button

@@ -1,11 +1,58 @@
 import { useEffect, useState } from "react";
 import { request } from "../api";
 
-function formatLabel(label) {
+function translateLabel(label) {
   if (!label) return "Не определено";
 
-  const normalized = label.replaceAll("_", " ").trim();
-  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+  const map = {
+    chihuahua: "Чихуахуа",
+    toy_terrier: "Той-терьер",
+    miniature_pinscher: "Карликовый пинчер",
+    doberman: "Доберман",
+    golden_retriever: "Золотистый ретривер",
+    labrador_retriever: "Лабрадор-ретривер",
+    german_shepherd: "Немецкая овчарка",
+    siberian_husky: "Сибирский хаски",
+    beagle: "Бигль",
+    french_bulldog: "Французский бульдог",
+    english_bulldog: "Английский бульдог",
+    pug: "Мопс",
+    pomeranian: "Померанский шпиц",
+    samoyed: "Самоед",
+    boxer: "Боксер",
+    dalmatian: "Далматин",
+    tabby: "Полосатая кошка",
+    tiger_cat: "Тигровая кошка",
+    persian_cat: "Персидская кошка",
+    siamese_cat: "Сиамская кошка",
+    egyptian_cat: "Египетская кошка",
+    lynx: "Рысь",
+    hamster: "Хомяк",
+    guinea_pig: "Морская свинка",
+    mouse: "Мышь",
+    rat: "Крыса",
+    cockatoo: "Какаду",
+    macaw: "Ара",
+    lorikeet: "Лорикет",
+    parrot: "Попугай",
+    canary: "Канарейка",
+  };
+
+  const normalized = label.toLowerCase().replaceAll(" ", "_").trim();
+
+  if (map[normalized]) return map[normalized];
+
+  return label
+    .replaceAll("_", " ")
+    .trim()
+    .replace(/\b\w/g, (ch) => ch.toUpperCase());
+}
+
+function getConfidenceText(confidence) {
+  const value = Number(confidence) || 0;
+  if (value >= 80) return "Высокая";
+  if (value >= 50) return "Средняя";
+  return "Низкая";
 }
 
 export default function Classify() {
@@ -58,14 +105,20 @@ export default function Classify() {
     "Не определено";
 
   return (
-    <section>
-      <h2>Модуль классификации</h2>
-      <p className="muted">Загрузите фото животного для классификации.</p>
+    <section className="classify-page">
+      <h2>Проверка модели</h2>
+      <p className="muted classify-subtitle">
+        Загрузите фотографию животного, чтобы посмотреть результат работы
+        модели.
+      </p>
 
       <div className="card classify-card">
         <div className="upload-box">
           <div className="upload-icon">📷</div>
-          <p>Нажмите для загрузки или выберите фото</p>
+          <p className="upload-title">Загрузите изображение животного</p>
+          <p className="muted">
+            Модель проанализирует фото и покажет наиболее вероятный результат.
+          </p>
 
           <input
             type="file"
@@ -78,85 +131,81 @@ export default function Classify() {
           />
 
           {selectedFile && (
-            <p style={{ marginTop: "10px" }}>
+            <p className="selected-file">
               Выбран файл: <strong>{selectedFile.name}</strong>
             </p>
           )}
 
           {previewUrl && (
-            <div style={{ marginTop: "18px" }}>
+            <div className="preview-box">
               <img
                 src={previewUrl}
                 alt="Предпросмотр"
-                style={{
-                  maxWidth: "260px",
-                  width: "100%",
-                  borderRadius: "16px",
-                  border: "1px solid #d9e1de",
-                }}
+                className="preview-image"
               />
             </div>
           )}
 
           <button
-            className="primary-btn"
+            className="primary-btn classify-btn"
             onClick={runClassification}
             disabled={loading}
-            style={{ marginTop: "18px" }}
           >
-            {loading ? "Классификация..." : "Классифицировать"}
+            {loading ? "Классификация..." : "Проверить изображение"}
           </button>
         </div>
 
         {result && (
           <div className="result-box">
-            <div className="card">
-              <h3>{result.predictedType || "Не определено"}</h3>
+            <div className="card classify-result-card">
+              <div className="result-header">
+                <h3>Результат анализа</h3>
+                <span className="status-pill status-pending">
+                  {getConfidenceText(result.confidence)} уверенность
+                </span>
+              </div>
 
-              <p>
-                <strong>Основной результат:</strong> {formatLabel(mainLabel)}
-              </p>
+              <div className="result-details">
+                <p>
+                  <strong>Тип:</strong>{" "}
+                  {result.predictedType || "Не удалось уверенно определить тип"}
+                </p>
 
-              <p>
-                <strong>Состояние:</strong>{" "}
-                {result.healthStatus || "Не определено"}
-              </p>
+                <p>
+                  <strong>Наиболее близкий результат модели:</strong>{" "}
+                  {translateLabel(mainLabel)}
+                </p>
 
-              <p>
-                <strong>Точность:</strong> {result.confidence ?? 0}%
-              </p>
+                <p>
+                  <strong>Состояние:</strong>{" "}
+                  {result.healthStatus || "Не определено"}
+                </p>
+
+                <p>
+                  <strong>Уверенность:</strong> {result.confidence ?? 0}%
+                </p>
+              </div>
+
+              <div className="notice-box notice-pending">
+                Результат модели является вспомогательной подсказкой и может
+                быть использован при добавлении карточки животного.
+              </div>
 
               {!!result.alternatives?.length && (
-                <div style={{ marginTop: "18px" }}>
+                <div className="alternatives-box">
                   <strong>Другие варианты:</strong>
 
                   {result.alternatives.map((item, index) => (
-                    <div key={index} style={{ marginTop: "12px" }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          marginBottom: "4px",
-                        }}
-                      >
-                        <span>{formatLabel(item.label)}</span>
+                    <div key={index} className="alternative-item">
+                      <div className="alternative-head">
+                        <span>{translateLabel(item.label)}</span>
                         <strong>{item.confidence}%</strong>
                       </div>
 
-                      <div
-                        style={{
-                          height: "8px",
-                          background: "#e5e7eb",
-                          borderRadius: "999px",
-                          overflow: "hidden",
-                        }}
-                      >
+                      <div className="confidence-track">
                         <div
-                          style={{
-                            height: "8px",
-                            background: "#1f9d72",
-                            width: `${item.confidence}%`,
-                          }}
+                          className="confidence-fill"
+                          style={{ width: `${item.confidence}%` }}
                         />
                       </div>
                     </div>

@@ -16,6 +16,7 @@ export default function Home({ user, onUserUpdate }) {
   const [healthFilter, setHealthFilter] = useState("Все");
   const [onlyPending, setOnlyPending] = useState(false);
   const [onlyAvailable, setOnlyAvailable] = useState(false);
+  const [requestUsers, setRequestUsers] = useState({});
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -55,7 +56,31 @@ export default function Home({ user, onUserUpdate }) {
       if (sort && sort !== "newest") query.set("sort", sort);
 
       const data = await request(`/animals?${query.toString()}`);
-      setAnimals(prepareAnimals(data));
+      const prepared = prepareAnimals(data);
+      setAnimals(prepared);
+
+      const requestIds = [
+        ...new Set(
+          prepared
+            .filter((a) => a.adoptionRequestedBy > 0)
+            .map((a) => a.adoptionRequestedBy),
+        ),
+      ];
+
+      const usersMap = {};
+
+      await Promise.all(
+        requestIds.map(async (id) => {
+          try {
+            const requestUser = await request(`/users/${id}`);
+            usersMap[id] = requestUser;
+          } catch {
+            usersMap[id] = null;
+          }
+        }),
+      );
+
+      setRequestUsers(usersMap);
     } catch (error) {
       console.error(error);
       setError(error.message || "Не удалось загрузить животных.");
@@ -267,6 +292,19 @@ export default function Home({ user, onUserUpdate }) {
     return "На лечении";
   };
 
+  const getHealthClass = (health) => {
+    if (!health) return "healthy";
+
+    const h = health.toLowerCase();
+
+    if (h.includes("здоров")) return "healthy";
+    if (h.includes("осмотр")) return "warning";
+    if (h.includes("леч")) return "treatment";
+    if (h.includes("уход")) return "care";
+
+    return "healthy";
+  };
+
   const getAnimalIcon = (type) => {
     if (!type) return dogIcon;
 
@@ -362,8 +400,14 @@ export default function Home({ user, onUserUpdate }) {
                     {a.breed}, {a.age}
                   </p>
 
+                  {a.source && (
+                    <p className="animal-source">Источник: {a.source}</p>
+                  )}
+
                   <div className="badge-row">
-                    <span className="badge">{a.health}</span>
+                    <span className={`badge badge-${getHealthClass(a.health)}`}>
+                      {a.health}
+                    </span>
                     <span className="tag">{a.type}</span>
                     <span className={getStatusClass(a.status)}>
                       {getStatusLabel(a.status)}
@@ -380,7 +424,19 @@ export default function Home({ user, onUserUpdate }) {
                     a.status === "pending" &&
                     a.adoptionRequestedBy > 0 && (
                       <div className="notice-box notice-pending">
-                        Заявка от пользователя #{a.adoptionRequestedBy}
+                        <strong>Заявка на усыновление</strong>
+                        <div className="request-contact">
+                          <div>
+                            Пользователь:{" "}
+                            {requestUsers[a.adoptionRequestedBy]?.name ||
+                              `#${a.adoptionRequestedBy}`}
+                          </div>
+                          <div>
+                            Email:{" "}
+                            {requestUsers[a.adoptionRequestedBy]?.email ||
+                              "Не удалось загрузить"}
+                          </div>
+                        </div>
                       </div>
                     )}
 
@@ -547,8 +603,9 @@ export default function Home({ user, onUserUpdate }) {
                 >
                   <option value="Все">Все</option>
                   <option value="Здоров">Здоров</option>
+                  <option value="осмотр">Требует осмотра</option>
                   <option value="леч">На лечении</option>
-                  <option value="Стерилизована">Стерилизована</option>
+                  <option value="уход">Особый уход</option>
                 </select>
               </label>
 

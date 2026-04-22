@@ -135,7 +135,9 @@ export default function App() {
         {page === "home" && (
           <Home user={user} onUserUpdate={handleUserUpdate} />
         )}
-        {page === "add" && <AddAnimal />}
+        {page === "add" && (
+          <AddAnimal user={user} onSuccess={() => setPage("profile")} />
+        )}
         {page === "classify" && <Classify />}
         {page === "analytics" && <Analytics />}
         {page === "login" && <Login onLogin={handleLogin} />}

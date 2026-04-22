@@ -8,6 +8,7 @@ type Animal struct {
 	Age                 string   `json:"age"`
 	Gender              string   `json:"gender"`
 	Health              string   `json:"health"`
+	Source              string   `json:"source"`
 	Description         string   `json:"description"`
 	Image               string   `json:"image"`
 	Status              string   `json:"status"`

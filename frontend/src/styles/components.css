@@ -50,8 +50,7 @@
 }
 
 .card,
-.stat-card,
-.animal-card {
+.stat-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 18px;
@@ -94,8 +93,7 @@
 }
 
 .badge,
-.tag,
-.status-pill {
+.tag {
   display: inline-block;
   padding: 6px 10px;
   border-radius: 999px;
@@ -103,23 +101,32 @@
 }
 
 .badge {
-  background: var(--primary-soft);
-  color: var(--primary);
+  font-weight: 600;
+}
+
+.badge-healthy {
+  background: #e7f6ec;
+  color: #18794e;
+}
+
+.badge-warning {
+  background: #fff4e5;
+  color: #b45309;
+}
+
+.badge-treatment {
+  background: #fde8e8;
+  color: #b42318;
+}
+
+.badge-care {
+  background: #eef2ff;
+  color: #4f46e5;
 }
 
 .tag {
   background: #95b1e4;
   color: #070707;
-}
-
-.status-pill.warning {
-  background: #fff1e8;
-  color: #b45309;
-}
-
-.status-pill.ok {
-  background: #ecfdf5;
-  color: #047857;
 }
 
 .animal-card {
@@ -134,7 +141,7 @@
 }
 
 .animal-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
 }
 
@@ -154,6 +161,7 @@
 .animal-content h4 {
   margin: 0 0 6px;
   font-size: 30px;
+  font-weight: 700;
 }
 
 .animal-content p {
@@ -603,7 +611,7 @@
 }
 
 .profile-avatar img {
-  width: 40 px;
+  width: 40px;
   height: 40px;
   object-fit: contain;
 }
@@ -658,4 +666,26 @@
   border-left: 4px solid #6366f1;
   padding: 16px;
   border-radius: 12px;
+}
+
+.animal-source {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.request-contact {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.request-contact div {
+  color: #475569;
 }

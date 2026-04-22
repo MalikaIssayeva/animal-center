@@ -58,6 +58,7 @@ func main() {
 		api.GET("/users/:id/favorites", handlers.GetUserFavorites)
 		api.POST("/users/:id/favorites/:animalId", handlers.AddFavorite)
 		api.DELETE("/users/:id/favorites/:animalId", handlers.RemoveFavorite)
+		api.GET("/users/:id", handlers.GetUserByID)
 	}
 
 	log.Println("server started on :8080")

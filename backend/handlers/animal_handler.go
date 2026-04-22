@@ -100,9 +100,16 @@ func CreateAnimal(c *gin.Context) {
 	input.Age = strings.TrimSpace(input.Age)
 	input.Gender = strings.TrimSpace(input.Gender)
 	input.Health = strings.TrimSpace(input.Health)
+	input.Source = strings.TrimSpace(input.Source)
 	input.Description = strings.TrimSpace(input.Description)
 
-	if input.Name == "" || input.Type == "" || input.Breed == "" || input.Age == "" || input.Gender == "" || input.Health == "" {
+	if input.Name == "" ||
+		input.Type == "" ||
+		input.Breed == "" ||
+		input.Age == "" ||
+		input.Gender == "" ||
+		input.Health == "" ||
+		input.Source == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Заполните обязательные поля"})
 		return
 	}

@@ -284,3 +284,38 @@ func toSafeUser(user models.User) models.SafeUser {
 		Favorites:   user.Favorites,
 	}
 }
+
+// @Summary Получить пользователя по ID
+// @Description Возвращает безопасные данные пользователя без пароля
+// @Tags users
+// @Produce json
+// @Param id path int true "ID пользователя"
+// @Success 200 {object} models.SafeUser
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /users/{id} [get]
+func GetUserByID(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Некорректный ID пользователя"})
+		return
+	}
+
+	Mu.Lock()
+	users, err := storage.ReadUsers(UsersFile)
+	Mu.Unlock()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Не удалось прочитать пользователей"})
+		return
+	}
+
+	for _, u := range users {
+		if u.ID == id {
+			c.JSON(http.StatusOK, toSafeUser(u))
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{"error": "Пользователь не найден"})
+}

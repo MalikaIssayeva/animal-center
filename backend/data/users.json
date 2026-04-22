@@ -46,7 +46,10 @@
     "password": "123456",
     "role": "user",
     "accountType": "adopter",
-    "favorites": []
+    "favorites": [
+      24,
+      25
+    ]
   },
   {
     "id": 6,

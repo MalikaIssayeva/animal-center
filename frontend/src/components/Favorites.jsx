@@ -59,6 +59,19 @@ export default function Favorites({ user, onUserUpdate }) {
     }
   };
 
+  const getHealthClass = (health) => {
+    if (!health) return "healthy";
+
+    const h = health.toLowerCase();
+
+    if (h.includes("здоров")) return "healthy";
+    if (h.includes("осмотр")) return "warning";
+    if (h.includes("леч")) return "treatment";
+    if (h.includes("уход")) return "care";
+
+    return "healthy";
+  };
+
   if (!user) {
     return <div className="card">Сначала войдите в аккаунт.</div>;
   }
@@ -83,7 +96,9 @@ export default function Favorites({ user, onUserUpdate }) {
                 </p>
 
                 <div className="badge-row">
-                  <span className="badge">{a.health}</span>
+                  <span className={`badge badge-${getHealthClass(a.health)}`}>
+                    {a.health}
+                  </span>
                   <span className="tag">{a.type}</span>
                 </div>
 

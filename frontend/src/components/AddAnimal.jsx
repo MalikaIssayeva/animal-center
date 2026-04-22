@@ -48,7 +48,7 @@ function translateLabel(label) {
     .replace(/\b\w/g, (ch) => ch.toUpperCase());
 }
 
-export default function AddAnimal({ onSuccess }) {
+export default function AddAnimal({ user, onSuccess }) {
   const [form, setForm] = useState({
     name: "",
     type: "Собака",
@@ -56,6 +56,7 @@ export default function AddAnimal({ onSuccess }) {
     age: "",
     gender: "Самец",
     health: "Здоров",
+    source: "Найдено на улице",
     description: "",
   });
 
@@ -122,7 +123,6 @@ export default function AddAnimal({ onSuccess }) {
         }));
       }
     } catch (err) {
-      console.error(err);
       setError(err.message || "Не удалось определить животное по фото.");
     } finally {
       setLoadingML(false);
@@ -149,7 +149,8 @@ export default function AddAnimal({ onSuccess }) {
       !form.breed.trim() ||
       !form.age.trim() ||
       !form.gender.trim() ||
-      !form.health.trim()
+      !form.health.trim() ||
+      !form.source.trim()
     ) {
       setError("Заполните обязательные поля.");
       return;
@@ -160,6 +161,7 @@ export default function AddAnimal({ onSuccess }) {
 
       const payload = {
         ...form,
+        ownerId: user?.accountType === "owner" ? user.id : 0,
         tags: [],
         status: form.health === "На лечении" ? "treatment" : "available",
       };
@@ -176,6 +178,7 @@ export default function AddAnimal({ onSuccess }) {
         age: "",
         gender: "Самец",
         health: "Здоров",
+        source: "Найдено на улице",
         description: "",
       });
 
@@ -185,7 +188,6 @@ export default function AddAnimal({ onSuccess }) {
 
       onSuccess?.();
     } catch (error) {
-      console.error(error);
       setError(error.message || "Не удалось добавить животное.");
     } finally {
       setLoadingSubmit(false);
@@ -233,7 +235,8 @@ export default function AddAnimal({ onSuccess }) {
                 <strong>Тип:</strong> {prediction.type}
               </p>
               <p>
-                <strong>Метка модели:</strong> {translateLabel(prediction.raw)}
+                <strong>Результат модели:</strong>{" "}
+                {translateLabel(prediction.raw)}
               </p>
               <p>
                 <strong>Уверенность:</strong> {prediction.confidence}%
@@ -306,11 +309,22 @@ export default function AddAnimal({ onSuccess }) {
               Статус здоровья
               <select name="health" value={form.health} onChange={handleChange}>
                 <option>Здоров</option>
+                <option>Требует осмотра</option>
                 <option>На лечении</option>
-                <option>Стерилизована</option>
+                <option>Особый уход</option>
               </select>
             </label>
           </div>
+
+          <label>
+            Источник поступления
+            <select name="source" value={form.source} onChange={handleChange}>
+              <option>Найдено на улице</option>
+              <option>Передано владельцем</option>
+              <option>Спасено волонтёрами</option>
+              <option>Передано из другого центра</option>
+            </select>
+          </label>
 
           <label>
             Описание

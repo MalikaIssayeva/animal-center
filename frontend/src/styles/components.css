@@ -8,6 +8,14 @@
   color: var(--muted);
 }
 
+.AddAnimal-h2,
+.Classify-h2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 .primary-btn,
 .secondary-btn {
   border: none;

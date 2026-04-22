@@ -141,11 +141,13 @@ export default function Classify() {
 
   return (
     <section className="classify-page">
-      <h2>Проверка модели</h2>
-      <p className="muted classify-subtitle">
-        Загрузите фотографию животного, чтобы посмотреть результат работы
-        модели.
-      </p>
+      <div className="Classify-h2">
+        <h2>Проверка модели</h2>
+        <p className="muted classify-subtitle">
+          Загрузите фотографию животного, чтобы посмотреть результат работы
+          модели.
+        </p>
+      </div>
 
       <div className="card classify-card">
         <div className="upload-box">

@@ -194,7 +194,9 @@ export default function AddAnimal({ onSuccess }) {
 
   return (
     <section>
-      <h2>Добавить животное</h2>
+      <div className="AddAnimal-h2">
+        <h2>Добавить животное</h2>
+      </div>
 
       <div className="AddAnimal-section">
         <form className="card form-card" onSubmit={handleSubmit}>

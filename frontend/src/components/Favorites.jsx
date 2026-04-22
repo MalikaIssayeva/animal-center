@@ -96,9 +96,11 @@ export default function Favorites({ user, onUserUpdate }) {
                 </p>
 
                 <div className="badge-row">
-                  <span className={`badge badge-${getHealthClass(a.health)}`}>
-                    {a.health}
-                  </span>
+                  {!(a.health === "На лечении" && a.status === "treatment") && (
+                    <span className={`badge badge-${getHealthClass(a.health)}`}>
+                      {a.health}
+                    </span>
+                  )}
                   <span className="tag">{a.type}</span>
                 </div>
 

@@ -405,9 +405,15 @@ export default function Home({ user, onUserUpdate }) {
                   )}
 
                   <div className="badge-row">
-                    <span className={`badge badge-${getHealthClass(a.health)}`}>
-                      {a.health}
-                    </span>
+                    {!(
+                      a.health === "На лечении" && a.status === "treatment"
+                    ) && (
+                      <span
+                        className={`badge badge-${getHealthClass(a.health)}`}
+                      >
+                        {a.health}
+                      </span>
+                    )}
                     <span className="tag">{a.type}</span>
                     <span className={getStatusClass(a.status)}>
                       {getStatusLabel(a.status)}
